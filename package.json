@@ -6,7 +6,12 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "server": "node server.js"
+    "server": "node server.js",
+    "wrangler": "wrangler",
+    "deploy": "wrangler deploy",
+    "d1:create": "wrangler d1 create",
+    "d1:execute": "wrangler d1 execute",
+    "d1:list": "wrangler d1 list"
   },
   "keywords": [
     "coupon",
@@ -16,11 +21,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.18.2",
-    "multer": "^1.4.5-lts.1",
-    "cors": "^2.8.5"
+    "multer": "^1.4.5-lts.1"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "wrangler": "^4.58.0"
   }
 }
