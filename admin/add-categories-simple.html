@@ -120,7 +120,7 @@
             <div class="admin-card">
                 <div class="admin-card-body">
                     <div style="text-align: center; margin: 30px 0;">
-                        <button class="admin-btn admin-btn-primary" id="importBtn" style="padding: 15px 40px; font-size: 16px;">
+                        <button class="admin-btn admin-btn-primary" id="importBtn" style="padding: 15px 40px; font-size: 16px;" type="button">
                             📥 Import All Categories
                         </button>
                     </div>
@@ -151,8 +151,8 @@
         }
         
         // Check authentication
-        const token = localStorage.getItem('authToken') || localStorage.getItem('adminToken');
-        if (!token) {
+        const authToken = localStorage.getItem('authToken') || localStorage.getItem('adminToken');
+        if (!authToken) {
             window.location.href = '/admin/login.html';
         }
         
