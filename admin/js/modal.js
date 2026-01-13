@@ -159,10 +159,14 @@ function validateForm(formId, rules = {}) {
         const field = form.querySelector(`[name="${fieldName}"]`);
         if (field) {
             const rule = rules[fieldName];
-            if (rule.required && !field.value.trim()) {
+            const fieldValue = field.value.trim();
+            
+            // Only validate required if rule.required is true
+            if (rule.required && !fieldValue) {
                 errors.push(`${fieldName} is required`);
                 field.classList.add('error');
-            } else if (rule.pattern && !rule.pattern.test(field.value)) {
+            } else if (rule.pattern && fieldValue && !rule.pattern.test(fieldValue)) {
+                // Only validate pattern if field has a value (skip if empty and not required)
                 errors.push(rule.message || `${fieldName} is invalid`);
                 field.classList.add('error');
             } else {
