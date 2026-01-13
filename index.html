@@ -1224,8 +1224,7 @@
             }
             
             console.log('🔄 Loading popular stores...');
-            // Clear static content first
-            container.innerHTML = '';
+            // Container already cleared by immediate script
             
             try {
                 const result = await StoreAPI.getAll();
