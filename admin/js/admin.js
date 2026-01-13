@@ -2,7 +2,11 @@
 
 // Check admin authentication
 function checkAdminAuth() {
-    if (!localStorage.getItem('adminLoggedIn')) {
+    const token = localStorage.getItem('authToken');
+    const adminLoggedIn = localStorage.getItem('adminLoggedIn');
+    
+    // Check both token and adminLoggedIn for compatibility
+    if (!token && !adminLoggedIn) {
         window.location.href = 'login.html';
         return false;
     }
