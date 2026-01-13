@@ -568,15 +568,73 @@
     <script src="js/main.js"></script>
     <script src="js/auth-modal.js"></script>
     <script src="js/redirect.js"></script>
+    <script type="module">
+        import { StoreAPI } from './js/api.js';
+        
+        // Load stores from API
+        async function loadStores() {
+            try {
+                const result = await StoreAPI.getAll();
+                if (result.success && result.data && result.data.length > 0) {
+                    renderStores(result.data);
+                } else {
+                    console.log('No stores found or API error:', result.error);
+                    // Keep static stores as fallback
+                }
+            } catch (error) {
+                console.error('Error loading stores:', error);
+                // Keep static stores as fallback
+            }
+        }
+        
+        function renderStores(stores) {
+            const grid = document.getElementById('storesGrid');
+            if (!grid) return;
+            
+            // Filter active stores only
+            const activeStores = stores.filter(store => store.status === 'active');
+            
+            if (activeStores.length === 0) {
+                return; // Keep static content if no stores
+            }
+            
+            grid.innerHTML = activeStores.map(store => {
+                const cashback = store.cashback ? `${store.cashback}% Cash Back` : 'Cash Back Available';
+                const logoUrl = store.logo_url || '';
+                const logoStyle = logoUrl ? `background-image: url('${logoUrl}'); background-size: contain; background-repeat: no-repeat; background-position: center;` : '';
+                const logoBg = store.logo_url ? '' : `background-color: ${getRandomColor()};`;
+                
+                return `
+                    <a href="coupons.html?store=${store.id}" class="all-store-card" data-category="${store.category || ''}" 
+                       ${store.redirect_url ? `onclick="event.preventDefault(); redirectToStore('${store.redirect_url}', '${store.name}');"` : ''}>
+                        <div class="all-store-logo">
+                            ${logoUrl ? 
+                                `<img src="${logoUrl}" alt="${store.name}" style="width: 100%; height: 100%; object-fit: contain; padding: 10px;">` :
+                                `<div class="store-logo-placeholder" style="${logoBg}">${store.name.substring(0, 10)}</div>`
+                            }
+                        </div>
+                        <div class="all-store-name">${store.name}</div>
+                        <div class="all-store-cashback">
+                            <span class="all-cashback-current">${cashback}</span>
+                        </div>
+                    </a>
+                `;
+            }).join('');
+        }
+        
+        function getRandomColor() {
+            const colors = ['#E31E24', '#2C2C2C', '#FF6B35', '#0066CC', '#4CAF50', '#FFD700', '#0D9488', '#003580'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+        
+        // Load stores when page loads
+        document.addEventListener('DOMContentLoaded', loadStores);
+    </script>
     <script>
-        // 在实际应用中，这里会从API加载商店数据
-        // 并为每个商店卡片添加跳转功能
-        // 示例：
-        // document.querySelectorAll('.all-store-card').forEach(card => {
-        //     const storeName = card.querySelector('.all-store-name').textContent;
-        //     const redirectUrl = getStoreRedirectUrl(storeName); // 从API获取
-        //     card.onclick = (e) => {
-        //         e.preventDefault();
+        // Fallback for non-module browsers
+        if (typeof window.StoreAPI === 'undefined') {
+            console.log('Using static stores as fallback');
+        }
         //         redirectToStore(redirectUrl, storeName);
         //     };
         // });
