@@ -135,7 +135,20 @@
 
     <script src="/admin/js/admin.js"></script>
     <script type="module">
-        import { CategoryAPI } from '/admin/js/api-real.js';
+        // Import API
+        let CategoryAPI;
+        
+        try {
+            const apiModule = await import('/admin/js/api-real.js');
+            CategoryAPI = apiModule.CategoryAPI;
+            console.log('✅ API module loaded');
+        } catch (error) {
+            console.error('❌ Failed to load API module:', error);
+            document.getElementById('statusMessage').style.display = 'block';
+            document.getElementById('statusMessage').style.background = '#f8d7da';
+            document.getElementById('statusMessage').style.color = '#721c24';
+            document.getElementById('statusMessage').innerHTML = 'Failed to load API module. Please check console for errors.';
+        }
         
         // Check authentication
         const token = localStorage.getItem('authToken') || localStorage.getItem('adminToken');
@@ -188,7 +201,10 @@
         // Display categories list
         function renderCategories() {
             const list = document.getElementById('categoryList');
-            if (!list) return;
+            if (!list) {
+                console.error('Category list element not found');
+                return;
+            }
             
             list.innerHTML = categories.map(cat => `
                 <div class="category-item" id="cat-${cat.slug}">
@@ -196,10 +212,18 @@
                     <span class="status-badge status-pending" id="status-${cat.slug}">Pending</span>
                 </div>
             `).join('');
+            console.log('✅ Categories list rendered');
         }
         
         // Import all categories
         async function importAllCategories() {
+            console.log('🚀 Import started');
+            
+            if (!CategoryAPI) {
+                alert('API not loaded. Please refresh the page.');
+                return;
+            }
+            
             const btn = document.getElementById('importBtn');
             const statusMsg = document.getElementById('statusMessage');
             
@@ -218,15 +242,19 @@
             let errorCount = 0;
             let skipCount = 0;
             
-            console.log('Starting import...');
+            console.log('Starting import of', categories.length, 'categories...');
             
             for (const category of categories) {
                 const item = document.getElementById(`cat-${category.slug}`);
                 const status = document.getElementById(`status-${category.slug}`);
                 
                 try {
+                    console.log(`Checking: ${category.name}...`);
+                    
                     // Check if category already exists
                     const allCategories = await CategoryAPI.getAll();
+                    console.log('All categories response:', allCategories);
+                    
                     const exists = allCategories.success && 
                         allCategories.data && 
                         allCategories.data.some(c => c.slug === category.slug);
@@ -238,13 +266,14 @@
                             status.className = 'status-badge status-success';
                         }
                         skipCount++;
-                        console.log(`Skipped (exists): ${category.name}`);
+                        console.log(`⏭️ Skipped (exists): ${category.name}`);
                         continue;
                     }
                     
                     // Add category
-                    console.log(`Adding: ${category.name}`);
+                    console.log(`➕ Adding: ${category.name}`);
                     const result = await CategoryAPI.create(category);
+                    console.log('Create result:', result);
                     
                     if (result.success) {
                         if (item) item.classList.add('added');
@@ -292,22 +321,28 @@
             btn.disabled = false;
             btn.textContent = 'Import Again';
             
-            console.log(`Import complete! Success: ${successCount}, Skipped: ${skipCount}, Failed: ${errorCount}`);
+            console.log(`✅ Import complete! Success: ${successCount}, Skipped: ${skipCount}, Failed: ${errorCount}`);
         }
         
         // Make function globally accessible
         window.importAllCategories = importAllCategories;
         
-        // Initialize
+        // Initialize when page loads
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('📄 Page loaded, initializing...');
             renderCategories();
             
             // Attach click handler
             const importBtn = document.getElementById('importBtn');
             if (importBtn) {
-                importBtn.addEventListener('click', importAllCategories);
+                importBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('🔘 Button clicked!');
+                    importAllCategories();
+                });
+                console.log('✅ Event listener attached to button');
             } else {
-                console.error('Import button not found on page load');
+                console.error('❌ Import button not found on page load');
             }
         });
     </script>
