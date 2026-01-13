@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>优惠券详情 - 优惠券网站</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <a href="index.html">
+                        <h1>HarmonyGear 24</h1>
+                    </a>
+                </div>
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="index.html">首页</a></li>
+                        <li><a href="stores.html">商店</a></li>
+                        <li><a href="coupons.html">优惠券</a></li>
+                        <li><a href="category.html">分类</a></li>
+                    </ul>
+                </nav>
+                <div class="header-actions">
+                    <a href="login.html" class="btn-login">登录</a>
+                    <a href="register.html" class="btn-register">免费注册</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 优惠券详情 -->
+    <section class="coupon-detail">
+        <div class="container">
+            <div class="detail-content">
+                <div class="detail-main">
+                    <div class="store-header">
+                        <div class="store-logo-large">
+                            <img src="images/stores/target.png" alt="Target" onerror="this.src='https://via.placeholder.com/150x75?text=Target'">
+                        </div>
+                        <div class="store-header-info">
+                            <h1>Target</h1>
+                            <div class="cashback-info">
+                                <span class="cashback-badge boosted">11% 现金返还</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="coupon-detail-card">
+                        <div class="coupon-detail-header">
+                            <h2>满$50减$10</h2>
+                            <span class="badge badge-new">新</span>
+                        </div>
+                        <div class="coupon-code-large">
+                            <span id="couponCode">SAVE10</span>
+                            <button class="btn btn-primary" onclick="copyCode('SAVE10')">复制代码</button>
+                        </div>
+                        <div class="coupon-description-full">
+                            <h3>优惠详情</h3>
+                            <p>在Target购物满$50即可享受$10折扣。此优惠适用于所有商品，包括服装、家居用品、电子产品等。优惠码在结账时使用。</p>
+                            <ul>
+                                <li>最低消费: $50</li>
+                                <li>折扣金额: $10</li>
+                                <li>有效期: 2024年12月31日</li>
+                                <li>适用范围: 所有商品</li>
+                            </ul>
+                        </div>
+                        <div class="coupon-usage">
+                            <h3>使用方法</h3>
+                            <ol>
+                                <li>点击"去购物"按钮跳转到Target官网</li>
+                                <li>选择您需要的商品，确保购物车总额达到$50或以上</li>
+                                <li>在结账页面，找到"优惠码"或"促销代码"输入框</li>
+                                <li>粘贴或输入优惠码: SAVE10</li>
+                                <li>确认折扣已应用，完成支付</li>
+                            </ol>
+                        </div>
+                        <div class="coupon-actions-large">
+                            <button class="btn btn-primary btn-large" onclick="copyCodeAndRedirect('SAVE10', 'https://www.target.com/?ref=harmonygear24&code=SAVE10')">去购物</button>
+                            <button class="btn btn-secondary btn-large" onclick="copyCode('SAVE10')">复制优惠码</button>
+                        </div>
+                    </div>
+
+                    <div class="coupon-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">1,234</div>
+                            <div class="stat-label">已使用次数</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">95%</div>
+                            <div class="stat-label">成功率</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">4.5</div>
+                            <div class="stat-label">用户评分</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-sidebar">
+                    <div class="sidebar-card">
+                        <h3>现金返还信息</h3>
+                        <p>通过HarmonyGear 24在Target购物，您将获得<strong>11%的现金返还</strong>。现金返还将自动累积到您的账户，最快在首次购买后15天支付。</p>
+                        <a href="register.html" class="btn btn-primary">立即注册</a>
+                    </div>
+
+                    <div class="sidebar-card">
+                        <h3>相关优惠券</h3>
+                        <div class="related-coupons">
+                            <div class="related-coupon-item">
+                                <span class="related-store">Target</span>
+                                <span class="related-title">满$100减$25</span>
+                                <a href="coupon-detail.html?id=2">查看 →</a>
+                            </div>
+                            <div class="related-coupon-item">
+                                <span class="related-store">Target</span>
+                                <span class="related-title">新用户立减$15</span>
+                                <a href="coupon-detail.html?id=3">查看 →</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-card">
+                        <h3>分享优惠券</h3>
+                        <div class="share-buttons">
+                            <button class="btn btn-outline btn-small">分享到微信</button>
+                            <button class="btn btn-outline btn-small">分享到微博</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>关于我们</h4>
+                    <ul>
+                        <li><a href="#">关于 HarmonyGear 24</a></li>
+                        <li><a href="#">如何开始</a></li>
+                        <li><a href="#">广告与合作伙伴</a></li>
+                        <li><a href="#">新闻中心</a></li>
+                        <li><a href="#">职业机会</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>商店与品牌</h4>
+                    <ul>
+                        <li><a href="stores.html">所有商店</a></li>
+                        <li><a href="category.html">按分类浏览</a></li>
+                        <li><a href="coupons.html">所有优惠券</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>工具与服务</h4>
+                    <ul>
+                        <li><a href="#">浏览器扩展</a></li>
+                        <li><a href="#">移动应用</a></li>
+                        <li><a href="#">店内现金返还</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>帮助</h4>
+                    <ul>
+                        <li><a href="#">常见问题</a></li>
+                        <li><a href="#">联系我们</a></li>
+                        <li><a href="#">服务条款</a></li>
+                        <li><a href="#">隐私政策</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 HarmonyGear 24. 保留所有权利。</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/redirect.js"></script>
+    <script>
+        // 从URL参数获取优惠券ID，然后从API获取优惠券数据
+        // 在实际应用中，这里会调用API获取优惠券的redirect_url
+        // 示例：
+        // const urlParams = new URLSearchParams(window.location.search);
+        // const couponId = urlParams.get('id');
+        // if (couponId) {
+        //     fetch(`/api/coupons/${couponId}`)
+        //         .then(res => res.json())
+        //         .then(data => {
+        //             if (data.redirect_url) {
+        //                 // 更新"去购物"按钮的跳转链接
+        //                 const shopBtn = document.querySelector('.coupon-actions-large .btn-primary');
+        //                 shopBtn.onclick = () => copyCodeAndRedirect('SAVE10', data.redirect_url);
+        //             }
+        //         });
+        // }
+    </script>
+</body>
+</html>

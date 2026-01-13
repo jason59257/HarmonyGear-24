@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - HarmonyGear 24</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .dashboard-header {
+            margin-bottom: 40px;
+        }
+
+        .dashboard-header h1 {
+            font-size: 32px;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        .dashboard-header p {
+            color: var(--text-secondary);
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 4px;
+        }
+
+        .stat-card .stat-change {
+            font-size: 12px;
+            color: var(--success-color);
+        }
+
+        .dashboard-section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+        }
+
+        .dashboard-section h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .cashback-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .cashback-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--bg-light);
+            border-radius: 8px;
+        }
+
+        .cashback-item-info h4 {
+            font-size: 16px;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+
+        .cashback-item-info p {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .cashback-amount {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-pending {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffa500;
+        }
+
+        .badge-confirmed {
+            background: rgba(0, 168, 98, 0.1);
+            color: var(--success-color);
+        }
+
+        .badge-paid {
+            background: rgba(107, 70, 193, 0.1);
+            color: #6B46C1;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 20px 16px;
+            }
+
+            .dashboard-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-brand">
+                <a href="index.html">HarmonyGear 24</a>
+            </div>
+            <ul class="navbar-nav">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="stores.html">Stores</a></li>
+                <li><a href="coupons.html">Coupons</a></li>
+                <li><a href="category.html">Categories</a></li>
+                <li><a href="user-dashboard.html" class="active">Dashboard</a></li>
+                <li><a href="login.html">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Dashboard Content -->
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>My Dashboard</h1>
+            <p>Welcome back! Here's your cashback summary and activity.</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <h3>Total Cashback</h3>
+                <div class="stat-value">$234.50</div>
+                <div class="stat-change">+$45.20 this month</div>
+            </div>
+            <div class="stat-card">
+                <h3>Pending Cashback</h3>
+                <div class="stat-value">$67.30</div>
+                <div class="stat-change">Will be available soon</div>
+            </div>
+            <div class="stat-card">
+                <h3>Available Balance</h3>
+                <div class="stat-value">$167.20</div>
+                <div class="stat-change">Ready to withdraw</div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Orders</h3>
+                <div class="stat-value">42</div>
+                <div class="stat-change">This year</div>
+            </div>
+        </div>
+
+        <!-- Cashback History -->
+        <div class="dashboard-section">
+            <h2>Recent Cashback Activity</h2>
+            <div class="cashback-list" id="cashbackList">
+                <div class="cashback-item">
+                    <div class="cashback-item-info">
+                        <h4>Amazon Purchase</h4>
+                        <p>Order #12345 • December 15, 2024</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="cashback-amount">+$12.50</div>
+                        <span class="badge badge-confirmed">Confirmed</span>
+                    </div>
+                </div>
+                <div class="cashback-item">
+                    <div class="cashback-item-info">
+                        <h4>Target Purchase</h4>
+                        <p>Order #12344 • December 12, 2024</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="cashback-amount">+$8.30</div>
+                        <span class="badge badge-pending">Pending</span>
+                    </div>
+                </div>
+                <div class="cashback-item">
+                    <div class="cashback-item-info">
+                        <h4>Walmart Purchase</h4>
+                        <p>Order #12343 • December 10, 2024</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="cashback-amount">+$5.20</div>
+                        <span class="badge badge-paid">Paid</span>
+                    </div>
+                </div>
+                <div class="cashback-item">
+                    <div class="cashback-item-info">
+                        <h4>Best Buy Purchase</h4>
+                        <p>Order #12342 • December 8, 2024</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="cashback-amount">+$15.75</div>
+                        <span class="badge badge-confirmed">Confirmed</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Saved Coupons -->
+        <div class="dashboard-section">
+            <h2>Saved Coupons</h2>
+            <div id="savedCoupons">
+                <div class="empty-state">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="3" y="8" width="18" height="13" rx="1" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 8V21" stroke="currentColor" stroke-width="2"/>
+                        <path d="M3 12H21" stroke="currentColor" stroke-width="2"/>
+                        <path d="M8 8C8 5.79086 9.79086 4 12 4C14.2091 4 16 5.79086 16 8" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    <p>No saved coupons yet. Start saving your favorite coupons!</p>
+                    <a href="coupons.html" style="margin-top: 16px; display: inline-block; color: var(--primary-color);">Browse Coupons</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Account Settings -->
+        <div class="dashboard-section">
+            <h2>Account Settings</h2>
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--bg-light); border-radius: 8px;">
+                    <div>
+                        <h4 style="margin-bottom: 4px;">Email Address</h4>
+                        <p style="font-size: 14px; color: var(--text-secondary);">user@example.com</p>
+                    </div>
+                    <button class="btn btn-secondary" style="padding: 8px 16px;">Change</button>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--bg-light); border-radius: 8px;">
+                    <div>
+                        <h4 style="margin-bottom: 4px;">Password</h4>
+                        <p style="font-size: 14px; color: var(--text-secondary);">••••••••</p>
+                    </div>
+                    <button class="btn btn-secondary" style="padding: 8px 16px;">Change</button>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--bg-light); border-radius: 8px;">
+                    <div>
+                        <h4 style="margin-bottom: 4px;">Payment Method</h4>
+                        <p style="font-size: 14px; color: var(--text-secondary);">Not set up</p>
+                    </div>
+                    <button class="btn btn-secondary" style="padding: 8px 16px;">Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>HarmonyGear 24</h3>
+                    <p>Your trusted cashback and coupon platform.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="stores.html">Stores</a></li>
+                        <li><a href="coupons.html">Coupons</a></li>
+                        <li><a href="category.html">Categories</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 HarmonyGear 24. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

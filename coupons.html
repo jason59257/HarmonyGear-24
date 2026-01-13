@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>所有优惠券 - 优惠券网站</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+    <!-- Top Links Bar -->
+    <div class="top-links-bar">
+        <div class="container">
+            <div class="top-links">
+                <a href="#">HarmonyGear 24 Card</a>
+                <a href="#">HarmonyGear 24 Dining</a>
+                <a href="#">How We Make Money</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <a href="index.html">
+                        <h1>HarmonyGear 24</h1>
+                    </a>
+                </div>
+                
+                <!-- Categories Dropdown -->
+                <div class="categories-dropdown">
+                    <button class="categories-btn">
+                        <span>Categories</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div class="categories-dropdown-menu">
+                        <div class="categories-intro-links">
+                            <a href="stores.html" class="intro-link">
+                                <span>See All Stores</span>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </a>
+                        </div>
+                        <div class="categories-list">
+                            <a href="category.html?cat=travel">Travel & Vacations</a>
+                            <a href="category.html?cat=clothing">Clothing</a>
+                            <a href="category.html?cat=beauty">Beauty & Wellness</a>
+                            <a href="category.html?cat=accessories">Accessories</a>
+                            <a href="category.html?cat=auto">Auto & Tires</a>
+                            <a href="category.html?cat=baby">Baby & Toddler</a>
+                            <a href="category.html?cat=banking">Banking & Finance Tools</a>
+                            <a href="category.html?cat=business">Business Supplies & Services</a>
+                            <a href="category.html?cat=digital">Digital Services & Streaming</a>
+                            <a href="category.html?cat=electronics">Electronics</a>
+                            <a href="category.html?cat=events">Events & Entertainment</a>
+                            <a href="category.html?cat=food">Food, Drinks & Restaurants</a>
+                            <a href="category.html?cat=gifts">Gifts, Flowers & Parties</a>
+                            <a href="category.html?cat=home">Home & Garden</a>
+                            <a href="category.html?cat=pets">Pets</a>
+                            <a href="category.html?cat=shoes">Shoes</a>
+                            <a href="category.html?cat=sports">Sports, Outdoors & Fitness</a>
+                            <a href="category.html?cat=subscription">Subscription Boxes & Services</a>
+                            <a href="category.html?cat=toys">Toys & Games</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="header-search">
+                    <form class="search-form" onsubmit="event.preventDefault(); performSearch();">
+                        <input type="text" placeholder="Search stores, products, and coupons" id="headerSearch">
+                        <button type="submit" class="search-btn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
+                                <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Rewards Link -->
+                <a href="#" class="rewards-link">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Rewards</span>
+                </a>
+
+                <!-- User Account / Login -->
+                <div class="user-account">
+                    <a href="login.html" class="user-link" id="userAccountLink">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        <span class="user-name">Sign In</span>
+                        <span class="user-balance">$0.00</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </a>
+                    <div class="user-dropdown-menu">
+                        <a href="login.html">Sign In</a>
+                        <a href="register.html">Join Free</a>
+                        <a href="#">My Account</a>
+                        <a href="#">Cash Back History</a>
+                        <a href="#">Settings</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 页面标题和搜索 -->
+    <section class="page-header">
+        <div class="container">
+            <h1 class="page-title">All Coupons</h1>
+            <p class="page-subtitle">Find the coupons and promo codes you need</p>
+        </div>
+    </section>
+
+    <!-- 筛选和排序 -->
+    <section class="filters-section">
+        <div class="container">
+            <div class="filters">
+                <div class="filter-item active" data-filter="all">全部</div>
+                <div class="filter-item" data-filter="new">最新</div>
+                <div class="filter-item" data-filter="hot">热门</div>
+                <div class="filter-item" data-filter="expiring">即将过期</div>
+            </div>
+            <div class="sort-selector">
+                <label>排序:</label>
+                <select id="sortSelect">
+                    <option value="newest">最新发布</option>
+                    <option value="popular">最受欢迎</option>
+                    <option value="expiring">即将过期</option>
+                </select>
+            </div>
+        </div>
+    </section>
+
+    <!-- 优惠券列表 -->
+    <section class="coupons-list">
+        <div class="container">
+            <div class="coupons-grid" id="couponsGrid">
+                <div class="coupon-card">
+                    <div class="coupon-header">
+                        <div class="coupon-store">Target</div>
+                        <span class="badge badge-new">新</span>
+                    </div>
+                    <div class="coupon-title">满$50减$10</div>
+                    <div class="coupon-description">适用于所有商品，最低消费$50</div>
+                    <div class="coupon-code">SAVE10</div>
+                    <div class="coupon-meta">
+                        <span>有效期至: 2024-12-31</span>
+                        <span>•</span>
+                        <span>已使用 1,234 次</span>
+                    </div>
+                    <div class="coupon-actions">
+                        <button class="btn btn-primary btn-small" onclick="copyCodeAndRedirect('SAVE10', 'https://target.com/?ref=harmonygear24&code=SAVE10')">复制代码并去购物</button>
+                        <a href="coupon-detail.html?id=1" class="btn btn-outline btn-small">查看详情</a>
+                    </div>
+                </div>
+
+                <div class="coupon-card">
+                    <div class="coupon-header">
+                        <div class="coupon-store">Nike</div>
+                        <span class="badge badge-hot">热门</span>
+                    </div>
+                    <div class="coupon-title">全场8折优惠</div>
+                    <div class="coupon-description">适用于所有运动鞋和服装</div>
+                    <div class="coupon-code">SPORT20</div>
+                    <div class="coupon-meta">
+                        <span>有效期至: 2024-11-30</span>
+                        <span>•</span>
+                        <span>已使用 2,567 次</span>
+                    </div>
+                    <div class="coupon-actions">
+                        <button class="btn btn-primary btn-small" onclick="copyCode('SPORT20')">复制代码</button>
+                        <a href="coupon-detail.html?id=2" class="btn btn-outline btn-small">查看详情</a>
+                    </div>
+                </div>
+
+                <div class="coupon-card">
+                    <div class="coupon-header">
+                        <div class="coupon-store">Macy's</div>
+                        <span class="badge badge-expiring">即将过期</span>
+                    </div>
+                    <div class="coupon-title">新用户立减$25</div>
+                    <div class="coupon-description">仅限首次购买用户</div>
+                    <div class="coupon-code">NEW25</div>
+                    <div class="coupon-meta">
+                        <span>有效期至: 2024-10-15</span>
+                        <span>•</span>
+                        <span>已使用 856 次</span>
+                    </div>
+                    <div class="coupon-actions">
+                        <button class="btn btn-primary btn-small" onclick="copyCode('NEW25')">复制代码</button>
+                        <a href="coupon-detail.html?id=3" class="btn btn-outline btn-small">查看详情</a>
+                    </div>
+                </div>
+
+                <div class="coupon-card">
+                    <div class="coupon-header">
+                        <div class="coupon-store">Best Buy</div>
+                        <span class="badge badge-new">新</span>
+                    </div>
+                    <div class="coupon-title">电子产品9折</div>
+                    <div class="coupon-description">适用于所有电子产品，最高减$100</div>
+                    <div class="coupon-code">TECH10</div>
+                    <div class="coupon-meta">
+                        <span>有效期至: 2024-12-31</span>
+                        <span>•</span>
+                        <span>已使用 3,421 次</span>
+                    </div>
+                    <div class="coupon-actions">
+                        <button class="btn btn-primary btn-small" onclick="copyCode('TECH10')">复制代码</button>
+                        <a href="coupon-detail.html?id=4" class="btn btn-outline btn-small">查看详情</a>
+                    </div>
+                </div>
+
+                <div class="coupon-card">
+                    <div class="coupon-header">
+                        <div class="coupon-store">Ulta Beauty</div>
+                    </div>
+                    <div class="coupon-title">美妆产品满$75减$15</div>
+                    <div class="coupon-description">适用于所有美妆和护肤产品</div>
+                    <div class="coupon-code">BEAUTY15</div>
+                    <div class="coupon-meta">
+                        <span>有效期至: 2024-11-20</span>
+                        <span>•</span>
+                        <span>已使用 1,789 次</span>
+                    </div>
+                    <div class="coupon-actions">
+                        <button class="btn btn-primary btn-small" onclick="copyCode('BEAUTY15')">复制代码</button>
+                        <a href="coupon-detail.html?id=5" class="btn btn-outline btn-small">查看详情</a>
+                    </div>
+                </div>
+
+                <div class="coupon-card">
+                    <div class="coupon-header">
+                        <div class="coupon-store">Sephora</div>
+                        <span class="badge badge-hot">热门</span>
+                    </div>
+                    <div class="coupon-title">会员专享8.5折</div>
+                    <div class="coupon-description">需注册成为会员</div>
+                    <div class="coupon-code">MEMBER15</div>
+                    <div class="coupon-meta">
+                        <span>有效期至: 2024-12-31</span>
+                        <span>•</span>
+                        <span>已使用 2,345 次</span>
+                    </div>
+                    <div class="coupon-actions">
+                        <button class="btn btn-primary btn-small" onclick="copyCode('MEMBER15')">复制代码</button>
+                        <a href="coupon-detail.html?id=6" class="btn btn-outline btn-small">查看详情</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 分页 -->
+            <div class="pagination">
+                <a href="#" class="active">1</a>
+                <a href="#">2</a>
+                <a href="#">3</a>
+                <a href="#">4</a>
+                <a href="#">5</a>
+                <a href="#">下一页 →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>关于我们</h4>
+                    <ul>
+                        <li><a href="#">关于 HarmonyGear 24</a></li>
+                        <li><a href="#">如何开始</a></li>
+                        <li><a href="#">广告与合作伙伴</a></li>
+                        <li><a href="#">新闻中心</a></li>
+                        <li><a href="#">职业机会</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>商店与品牌</h4>
+                    <ul>
+                        <li><a href="stores.html">所有商店</a></li>
+                        <li><a href="category.html">按分类浏览</a></li>
+                        <li><a href="coupons.html">所有优惠券</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>工具与服务</h4>
+                    <ul>
+                        <li><a href="#">浏览器扩展</a></li>
+                        <li><a href="#">移动应用</a></li>
+                        <li><a href="#">店内现金返还</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>帮助</h4>
+                    <ul>
+                        <li><a href="#">常见问题</a></li>
+                        <li><a href="#">联系我们</a></li>
+                        <li><a href="#">服务条款</a></li>
+                        <li><a href="#">隐私政策</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 HarmonyGear 24. 保留所有权利。</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/redirect.js"></script>
+    <script>
+        function performSearch() {
+            const query = document.getElementById('couponSearch').value;
+            if (query.trim()) {
+                console.log('搜索:', query);
+            }
+        }
+
+        document.getElementById('couponSearch').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+    </script>
+</body>
+</html>
