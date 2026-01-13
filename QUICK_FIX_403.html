@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Quick Fix 403 Error</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #6B46C1;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #553C9A;
+        }
+        .error {
+            color: #ff4757;
+            background: #ffe0e0;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        .success {
+            color: #00A862;
+            background: #e0ffe0;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>修复 403 Forbidden 错误</h1>
+        
+        <div id="status"></div>
+        
+        <h2>步骤 1: 检查 Token</h2>
+        <button onclick="checkToken()">检查当前 Token</button>
+        
+        <h2>步骤 2: 重新登录</h2>
+        <button onclick="clearAndLogin()">清除并重新登录</button>
+        
+        <h2>步骤 3: 测试 API 权限</h2>
+        <button onclick="testAPIPermission()">测试 API 权限</button>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function checkToken() {
+            const status = document.getElementById('status');
+            const result = document.getElementById('result');
+            
+            const token = localStorage.getItem('authToken') || localStorage.getItem('adminToken');
+            
+            if (!token) {
+                status.innerHTML = '<div class="error">❌ 没有找到 token！请先登录。</div>';
+                result.innerHTML = '';
+                return;
+            }
+            
+            try {
+                const parts = token.split('.');
+                if (parts.length !== 3) {
+                    status.innerHTML = '<div class="error">❌ Token 格式无效</div>';
+                    return;
+                }
+                
+                const payload = JSON.parse(atob(parts[1]));
+                
+                let html = '<div class="success"><h3>Token 信息：</h3><pre>';
+                html += `Email: ${payload.email || 'N/A'}\n`;
+                html += `Role: ${payload.role || 'N/A'}\n`;
+                html += `User ID: ${payload.userId || 'N/A'}\n`;
+                html += `Expires: ${new Date(payload.exp * 1000).toLocaleString()}\n`;
+                html += '</pre></div>';
+                
+                if (payload.role !== 'admin') {
+                    html += '<div class="error"><strong>❌ 问题找到了！</strong><br>Token 的 role 不是 "admin"，当前是: "' + payload.role + '"<br><br>请点击"清除并重新登录"按钮，然后使用管理员账号登录。</div>';
+                } else {
+                    html += '<div class="success">✅ Token role 正确！如果仍然出现 403 错误，可能是其他问题。</div>';
+                }
+                
+                status.innerHTML = html;
+                result.innerHTML = '<pre>' + JSON.stringify(payload, null, 2) + '</pre>';
+            } catch (error) {
+                status.innerHTML = '<div class="error">❌ 解析 token 时出错: ' + error.message + '</div>';
+            }
+        }
+        
+        function clearAndLogin() {
+            localStorage.clear();
+            window.location.href = '/admin/login.html';
+        }
+        
+        async function testAPIPermission() {
+            const result = document.getElementById('result');
+            result.innerHTML = '<p>正在测试...</p>';
+            
+            const token = localStorage.getItem('authToken') || localStorage.getItem('adminToken');
+            
+            if (!token) {
+                result.innerHTML = '<div class="error">❌ 没有 token，请先登录</div>';
+                return;
+            }
+            
+            try {
+                // 测试 GET categories（不需要 admin）
+                const getResponse = await fetch('https://coupon-api.jason59257.workers.dev/api/categories', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const getData = await getResponse.json();
+                
+                // 测试 POST categories（需要 admin）
+                const postResponse = await fetch('https://coupon-api.jason59257.workers.dev/api/categories', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: 'Test Category',
+                        slug: 'test-category-' + Date.now(),
+                        description: 'Test'
+                    })
+                });
+                
+                const postData = await postResponse.json();
+                
+                let html = '<h3>API 权限测试结果：</h3>';
+                html += '<div><strong>GET /api/categories:</strong> ';
+                html += getResponse.ok ? '<span style="color: green;">✅ ' + getResponse.status + '</span>' : '<span style="color: red;">❌ ' + getResponse.status + '</span>';
+                html += '</div>';
+                
+                html += '<div><strong>POST /api/categories:</strong> ';
+                html += postResponse.ok ? '<span style="color: green;">✅ ' + postResponse.status + '</span>' : '<span style="color: red;">❌ ' + postResponse.status + ' - ' + (postData.error || 'Forbidden') + '</span>';
+                html += '</div>';
+                
+                html += '<pre>GET Response: ' + JSON.stringify(getData, null, 2) + '</pre>';
+                html += '<pre>POST Response: ' + JSON.stringify(postData, null, 2) + '</pre>';
+                
+                if (postResponse.status === 403) {
+                    html += '<div class="error"><strong>❌ POST 请求返回 403 Forbidden</strong><br>这说明你的 token 没有 admin 权限。<br>请点击"清除并重新登录"按钮，使用管理员账号登录。</div>';
+                } else if (postResponse.ok) {
+                    html += '<div class="success">✅ POST 请求成功！权限正常。</div>';
+                }
+                
+                result.innerHTML = html;
+            } catch (error) {
+                result.innerHTML = '<div class="error">❌ 测试出错: ' + error.message + '</div>';
+            }
+        }
+        
+        // 自动检查
+        window.addEventListener('load', function() {
+            setTimeout(checkToken, 500);
+        });
+    </script>
+</body>
+</html>
