@@ -91,9 +91,22 @@
     cursor: text !important;
     background: white !important;
     -webkit-user-select: text !important;
+    -moz-user-select: text !important;
+    -ms-user-select: text !important;
     user-select: text !important;
     opacity: 1 !important;
     visibility: visible !important;
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
+}
+
+.admin-login-form input[type="email"]:focus,
+.admin-login-form input[type="password"]:focus,
+.admin-login-form input[type="text"]:focus {
+    pointer-events: auto !important;
+    z-index: 1001 !important;
+    outline: 2px solid var(--admin-primary) !important;
+    outline-offset: 2px !important;
 }
 
 .admin-login-form input[type="email"]:focus,

@@ -16,19 +16,27 @@
                 <p>Sign in to manage your platform</p>
             </div>
             
-            <form id="adminLoginForm" class="admin-login-form" style="position: relative; z-index: 10;">
+            <form id="adminLoginForm" class="admin-login-form" style="position: relative; z-index: 10;" onsubmit="return false;">
                 <div class="form-group-modern" style="position: relative; z-index: 10;">
                     <label for="adminEmail">Email Address</label>
                     <input type="email" id="adminEmail" name="email" placeholder="admin@harmonygear24.com" required 
-                           style="pointer-events: auto !important; position: relative; z-index: 10; cursor: text !important; background: white !important;">
+                           autocomplete="email"
+                           style="pointer-events: auto !important; position: relative; z-index: 1000 !important; cursor: text !important; background: white !important; -webkit-user-select: text !important; user-select: text !important;"
+                           onclick="this.focus(); event.stopPropagation();"
+                           onfocus="event.stopPropagation();"
+                           onkeydown="event.stopPropagation();">
                 </div>
                 
                 <div class="form-group-modern" style="position: relative; z-index: 10;">
                     <label for="adminPassword">Password</label>
                     <div class="password-input-wrapper" style="position: relative; z-index: 10;">
                         <input type="password" id="adminPassword" name="password" placeholder="Enter your password" required
-                               style="pointer-events: auto !important; position: relative; z-index: 10; cursor: text !important; background: white !important; padding-right: 50px;">
-                        <button type="button" class="password-toggle" onclick="togglePassword('adminPassword')" style="pointer-events: auto !important; z-index: 11;">
+                               autocomplete="current-password"
+                               style="pointer-events: auto !important; position: relative; z-index: 1000 !important; cursor: text !important; background: white !important; padding-right: 50px; -webkit-user-select: text !important; user-select: text !important;"
+                               onclick="this.focus(); event.stopPropagation();"
+                               onfocus="event.stopPropagation();"
+                               onkeydown="event.stopPropagation();">
+                        <button type="button" class="password-toggle" onclick="togglePassword('adminPassword'); event.stopPropagation();" style="pointer-events: auto !important; z-index: 1001 !important;">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="eye-icon">
                                 <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                 <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
@@ -70,8 +78,38 @@
                 emailInput.readOnly = false;
                 emailInput.style.pointerEvents = 'auto';
                 emailInput.style.cursor = 'text';
+                emailInput.style.userSelect = 'text';
+                emailInput.style.webkitUserSelect = 'text';
                 emailInput.removeAttribute('readonly');
                 emailInput.removeAttribute('disabled');
+                
+                // Remove any event listeners that might block input
+                emailInput.onclick = null;
+                emailInput.onmousedown = null;
+                emailInput.onmouseup = null;
+                
+                // Ensure input can receive focus and input
+                emailInput.addEventListener('focus', function(e) {
+                    e.stopPropagation();
+                    this.focus();
+                }, true);
+                
+                emailInput.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    this.focus();
+                }, true);
+                
+                emailInput.addEventListener('keydown', function(e) {
+                    e.stopPropagation();
+                }, true);
+                
+                emailInput.addEventListener('keypress', function(e) {
+                    e.stopPropagation();
+                }, true);
+                
+                emailInput.addEventListener('input', function(e) {
+                    e.stopPropagation();
+                }, true);
             }
             
             if (passwordInput) {
@@ -79,8 +117,49 @@
                 passwordInput.readOnly = false;
                 passwordInput.style.pointerEvents = 'auto';
                 passwordInput.style.cursor = 'text';
+                passwordInput.style.userSelect = 'text';
+                passwordInput.style.webkitUserSelect = 'text';
                 passwordInput.removeAttribute('readonly');
                 passwordInput.removeAttribute('disabled');
+                
+                // Remove any event listeners that might block input
+                passwordInput.onclick = null;
+                passwordInput.onmousedown = null;
+                passwordInput.onmouseup = null;
+                
+                // Ensure input can receive focus and input
+                passwordInput.addEventListener('focus', function(e) {
+                    e.stopPropagation();
+                    this.focus();
+                }, true);
+                
+                passwordInput.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    this.focus();
+                }, true);
+                
+                passwordInput.addEventListener('keydown', function(e) {
+                    e.stopPropagation();
+                }, true);
+                
+                passwordInput.addEventListener('keypress', function(e) {
+                    e.stopPropagation();
+                }, true);
+                
+                passwordInput.addEventListener('input', function(e) {
+                    e.stopPropagation();
+                }, true);
+            }
+            
+            // Prevent form container from blocking events
+            const form = document.getElementById('adminLoginForm');
+            if (form) {
+                form.addEventListener('click', function(e) {
+                    // Allow clicks on inputs to pass through
+                    if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') {
+                        e.stopPropagation();
+                    }
+                }, true);
             }
             
             // Test if inputs are focusable
