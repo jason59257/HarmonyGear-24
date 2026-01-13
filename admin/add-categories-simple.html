@@ -324,27 +324,67 @@
             console.log(`✅ Import complete! Success: ${successCount}, Skipped: ${skipCount}, Failed: ${errorCount}`);
         }
         
-        // Make function globally accessible
+        // Make function globally accessible immediately
         window.importAllCategories = importAllCategories;
         
-        // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('📄 Page loaded, initializing...');
-            renderCategories();
-            
-            // Attach click handler
+        // Render categories immediately
+        renderCategories();
+        
+        // Wait for DOM to be ready, then attach event listener
+        function attachButtonHandler() {
             const importBtn = document.getElementById('importBtn');
             if (importBtn) {
-                importBtn.addEventListener('click', function(e) {
+                // Remove any existing listeners
+                const newBtn = importBtn.cloneNode(true);
+                importBtn.parentNode.replaceChild(newBtn, importBtn);
+                
+                // Attach new listener
+                newBtn.addEventListener('click', function(e) {
                     e.preventDefault();
+                    e.stopPropagation();
                     console.log('🔘 Button clicked!');
                     importAllCategories();
                 });
+                
                 console.log('✅ Event listener attached to button');
+                return true;
             } else {
-                console.error('❌ Import button not found on page load');
+                console.error('❌ Import button not found');
+                return false;
             }
-        });
+        }
+        
+        // Try multiple times to ensure button is available
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('📄 DOMContentLoaded fired');
+                if (!attachButtonHandler()) {
+                    // Retry after a short delay
+                    setTimeout(attachButtonHandler, 100);
+                }
+            });
+        } else {
+            // DOM already loaded
+            console.log('📄 DOM already loaded');
+            if (!attachButtonHandler()) {
+                setTimeout(attachButtonHandler, 100);
+            }
+        }
+        
+        // Also try after a delay as fallback
+        setTimeout(function() {
+            const btn = document.getElementById('importBtn');
+            if (btn && !btn.hasAttribute('data-listener-attached')) {
+                btn.setAttribute('data-listener-attached', 'true');
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('🔘 Button clicked (fallback handler)!');
+                    importAllCategories();
+                });
+                console.log('✅ Fallback event listener attached');
+            }
+        }, 500);
     </script>
 </body>
 </html>
