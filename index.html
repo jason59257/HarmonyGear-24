@@ -6,6 +6,24 @@
     <title>HarmonyGear 24 - Get Cash Back & Coupons</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/components.css">
+    <script>
+        // Immediately hide static content containers on page load
+        (function() {
+            const style = document.createElement('style');
+            style.textContent = `
+                #popularStoresRow > .store-card-popular,
+                #extraCashBackStores > .store-card-compact,
+                #dealsRow > .deal-card,
+                #hotDealsGrid > .hot-deal-card,
+                #priceDropsProducts > .product-card,
+                #featuredStoresGrid > .store-card,
+                #latestCouponsGrid > .coupon-card {
+                    display: none !important;
+                }
+            `;
+            document.head.appendChild(style);
+        })();
+    </script>
 </head>
 <body>
     <!-- Top Links Bar -->
