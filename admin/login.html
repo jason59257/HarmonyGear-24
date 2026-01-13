@@ -6,6 +6,33 @@
     <title>Admin Login - HarmonyGear 24</title>
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/admin/css/admin.css">
+    <style>
+        /* Override any conflicting styles */
+        #adminEmail, #adminPassword {
+            pointer-events: auto !important;
+            -webkit-user-select: text !important;
+            user-select: text !important;
+            cursor: text !important;
+            background: white !important;
+            position: relative !important;
+            z-index: 9999 !important;
+        }
+        
+        .admin-login-form {
+            pointer-events: auto !important;
+        }
+        
+        .admin-login-form * {
+            pointer-events: auto !important;
+        }
+        
+        /* Prevent any overlay from blocking */
+        body.admin-login-page::before,
+        body.admin-login-page::after {
+            display: none !important;
+            pointer-events: none !important;
+        }
+    </style>
 </head>
 <body class="admin-login-page">
     <div class="admin-login-container">
@@ -16,27 +43,23 @@
                 <p>Sign in to manage your platform</p>
             </div>
             
-            <form id="adminLoginForm" class="admin-login-form" style="position: relative; z-index: 10;" onsubmit="return false;">
-                <div class="form-group-modern" style="position: relative; z-index: 10;">
+            <form id="adminLoginForm" class="admin-login-form">
+                <div class="form-group-modern">
                     <label for="adminEmail">Email Address</label>
-                    <input type="email" id="adminEmail" name="email" placeholder="admin@harmonygear24.com" required 
+                    <input type="email" id="adminEmail" name="email" 
+                           placeholder="admin@harmonygear24.com" 
                            autocomplete="email"
-                           style="pointer-events: auto !important; position: relative; z-index: 1000 !important; cursor: text !important; background: white !important; -webkit-user-select: text !important; user-select: text !important;"
-                           onclick="this.focus(); event.stopPropagation();"
-                           onfocus="event.stopPropagation();"
-                           onkeydown="event.stopPropagation();">
+                           required>
                 </div>
                 
-                <div class="form-group-modern" style="position: relative; z-index: 10;">
+                <div class="form-group-modern">
                     <label for="adminPassword">Password</label>
-                    <div class="password-input-wrapper" style="position: relative; z-index: 10;">
-                        <input type="password" id="adminPassword" name="password" placeholder="Enter your password" required
+                    <div class="password-input-wrapper">
+                        <input type="password" id="adminPassword" name="password" 
+                               placeholder="Enter your password" 
                                autocomplete="current-password"
-                               style="pointer-events: auto !important; position: relative; z-index: 1000 !important; cursor: text !important; background: white !important; padding-right: 50px; -webkit-user-select: text !important; user-select: text !important;"
-                               onclick="this.focus(); event.stopPropagation();"
-                               onfocus="event.stopPropagation();"
-                               onkeydown="event.stopPropagation();">
-                        <button type="button" class="password-toggle" onclick="togglePassword('adminPassword'); event.stopPropagation();" style="pointer-events: auto !important; z-index: 1001 !important;">
+                               required>
+                        <button type="button" class="password-toggle" id="togglePasswordBtn">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="eye-icon">
                                 <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                 <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
@@ -53,7 +76,7 @@
                         <input type="checkbox" name="remember">
                         <span>Remember me</span>
                     </label>
-                    <a href="#" class="forgot-password-link" onclick="event.preventDefault(); alert('Please contact system administrator');">Forgot password?</a>
+                    <a href="#" class="forgot-password-link" id="forgotPasswordLink">Forgot password?</a>
                 </div>
                 
                 <button type="submit" class="btn btn-primary btn-large btn-block-modern">Sign In</button>
@@ -65,145 +88,93 @@
         </div>
     </div>
 
-    <script src="/admin/js/admin.js"></script>
     <script>
-        // Ensure inputs are enabled when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            const emailInput = document.getElementById('adminEmail');
-            const passwordInput = document.getElementById('adminPassword');
+        // Simple, clean script without conflicts
+        (function() {
+            'use strict';
             
-            // Force enable inputs
-            if (emailInput) {
-                emailInput.disabled = false;
-                emailInput.readOnly = false;
-                emailInput.style.pointerEvents = 'auto';
-                emailInput.style.cursor = 'text';
-                emailInput.style.userSelect = 'text';
-                emailInput.style.webkitUserSelect = 'text';
-                emailInput.removeAttribute('readonly');
-                emailInput.removeAttribute('disabled');
+            // Wait for DOM to be ready
+            function init() {
+                const emailInput = document.getElementById('adminEmail');
+                const passwordInput = document.getElementById('adminPassword');
+                const toggleBtn = document.getElementById('togglePasswordBtn');
+                const loginForm = document.getElementById('adminLoginForm');
+                const forgotLink = document.getElementById('forgotPasswordLink');
                 
-                // Remove any event listeners that might block input
-                emailInput.onclick = null;
-                emailInput.onmousedown = null;
-                emailInput.onmouseup = null;
-                
-                // Ensure input can receive focus and input
-                emailInput.addEventListener('focus', function(e) {
-                    e.stopPropagation();
-                    this.focus();
-                }, true);
-                
-                emailInput.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    this.focus();
-                }, true);
-                
-                emailInput.addEventListener('keydown', function(e) {
-                    e.stopPropagation();
-                }, true);
-                
-                emailInput.addEventListener('keypress', function(e) {
-                    e.stopPropagation();
-                }, true);
-                
-                emailInput.addEventListener('input', function(e) {
-                    e.stopPropagation();
-                }, true);
-            }
-            
-            if (passwordInput) {
-                passwordInput.disabled = false;
-                passwordInput.readOnly = false;
-                passwordInput.style.pointerEvents = 'auto';
-                passwordInput.style.cursor = 'text';
-                passwordInput.style.userSelect = 'text';
-                passwordInput.style.webkitUserSelect = 'text';
-                passwordInput.removeAttribute('readonly');
-                passwordInput.removeAttribute('disabled');
-                
-                // Remove any event listeners that might block input
-                passwordInput.onclick = null;
-                passwordInput.onmousedown = null;
-                passwordInput.onmouseup = null;
-                
-                // Ensure input can receive focus and input
-                passwordInput.addEventListener('focus', function(e) {
-                    e.stopPropagation();
-                    this.focus();
-                }, true);
-                
-                passwordInput.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    this.focus();
-                }, true);
-                
-                passwordInput.addEventListener('keydown', function(e) {
-                    e.stopPropagation();
-                }, true);
-                
-                passwordInput.addEventListener('keypress', function(e) {
-                    e.stopPropagation();
-                }, true);
-                
-                passwordInput.addEventListener('input', function(e) {
-                    e.stopPropagation();
-                }, true);
-            }
-            
-            // Prevent form container from blocking events
-            const form = document.getElementById('adminLoginForm');
-            if (form) {
-                form.addEventListener('click', function(e) {
-                    // Allow clicks on inputs to pass through
-                    if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') {
-                        e.stopPropagation();
-                    }
-                }, true);
-            }
-            
-            // Test if inputs are focusable
-            console.log('Email input:', emailInput);
-            console.log('Password input:', passwordInput);
-        });
-
-        function togglePassword(inputId) {
-            const input = document.getElementById(inputId);
-            if (!input) return;
-            
-            const wrapper = input.closest('.password-input-wrapper');
-            const button = wrapper ? wrapper.querySelector('.password-toggle') : null;
-            const eyeIcon = button ? button.querySelector('.eye-icon') : null;
-            const eyeOffIcon = button ? button.querySelector('.eye-off-icon') : null;
-            
-            if (input.type === 'password') {
-                input.type = 'text';
-                if (eyeIcon) eyeIcon.style.display = 'none';
-                if (eyeOffIcon) eyeOffIcon.style.display = 'block';
-            } else {
-                input.type = 'password';
-                if (eyeIcon) eyeIcon.style.display = 'block';
-                if (eyeOffIcon) eyeOffIcon.style.display = 'none';
-            }
-        }
-
-        const loginForm = document.getElementById('adminLoginForm');
-        if (loginForm) {
-            loginForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const email = document.getElementById('adminEmail').value;
-                const password = document.getElementById('adminPassword').value;
-                
-                // Demo login - in production, this would connect to backend
-                if (email && password) {
-                    localStorage.setItem('adminLoggedIn', 'true');
-                    localStorage.setItem('adminEmail', email);
-                    window.location.href = 'dashboard.html';
-                } else {
-                    alert('Please enter email and password');
+                // Ensure inputs are enabled
+                if (emailInput) {
+                    emailInput.disabled = false;
+                    emailInput.readOnly = false;
+                    emailInput.removeAttribute('readonly');
+                    emailInput.removeAttribute('disabled');
                 }
-            });
-        }
+                
+                if (passwordInput) {
+                    passwordInput.disabled = false;
+                    passwordInput.readOnly = false;
+                    passwordInput.removeAttribute('readonly');
+                    passwordInput.removeAttribute('disabled');
+                }
+                
+                // Password toggle
+                if (toggleBtn && passwordInput) {
+                    toggleBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        if (passwordInput.type === 'password') {
+                            passwordInput.type = 'text';
+                            const eyeIcon = toggleBtn.querySelector('.eye-icon');
+                            const eyeOffIcon = toggleBtn.querySelector('.eye-off-icon');
+                            if (eyeIcon) eyeIcon.style.display = 'none';
+                            if (eyeOffIcon) eyeOffIcon.style.display = 'block';
+                        } else {
+                            passwordInput.type = 'password';
+                            const eyeIcon = toggleBtn.querySelector('.eye-icon');
+                            const eyeOffIcon = toggleBtn.querySelector('.eye-off-icon');
+                            if (eyeIcon) eyeIcon.style.display = 'block';
+                            if (eyeOffIcon) eyeOffIcon.style.display = 'none';
+                        }
+                    });
+                }
+                
+                // Forgot password link
+                if (forgotLink) {
+                    forgotLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        alert('Please contact system administrator');
+                    });
+                }
+                
+                // Form submission
+                if (loginForm) {
+                    loginForm.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        const email = emailInput ? emailInput.value : '';
+                        const password = passwordInput ? passwordInput.value : '';
+                        
+                        if (email && password) {
+                            localStorage.setItem('adminLoggedIn', 'true');
+                            localStorage.setItem('adminEmail', email);
+                            window.location.href = 'dashboard.html';
+                        } else {
+                            alert('Please enter email and password');
+                        }
+                        
+                        return false;
+                    });
+                }
+            }
+            
+            // Initialize when DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
     </script>
 </body>
 </html>
