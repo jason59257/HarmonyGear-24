@@ -574,15 +574,21 @@
         // Load stores from API
         async function loadStores() {
             try {
+                console.log('Loading stores from API...');
                 const result = await StoreAPI.getAll();
+                console.log('StoreAPI.getAll result:', result);
+                
                 if (result.success && result.data && result.data.length > 0) {
+                    console.log(`Found ${result.data.length} stores, rendering...`);
                     renderStores(result.data);
                 } else {
                     console.log('No stores found or API error:', result.error);
+                    console.log('Result data:', result.data);
                     // Keep static stores as fallback
                 }
             } catch (error) {
                 console.error('Error loading stores:', error);
+                console.error('Error stack:', error.stack);
                 // Keep static stores as fallback
             }
         }

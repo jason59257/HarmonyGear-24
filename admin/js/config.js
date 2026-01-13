@@ -6,7 +6,7 @@ export const CONFIG = {
     API_BASE_URL: 'https://coupon-api.jason59257.workers.dev',
     
     // Cloudflare Worker URL for image uploads
-    UPLOAD_WORKER_URL: 'https://coupon-upload-handler.jason59257.workers.dev',
+    UPLOAD_WORKER_URL: 'https://coupon-api.jason59257.workers.dev/api/upload',
     
     // R2 Public URL for displaying images
     // Update this after configuring R2 public access

@@ -24,8 +24,30 @@ export async function verifyToken(token, env) {
     try {
         const secret = env.JWT_SECRET;
         const decoded = await jwt.verify(token, secret);
+        
+        // Log the full decoded structure for debugging
+        console.log('verifyToken - Full decoded object:', JSON.stringify(decoded));
+        console.log('verifyToken - decoded.role:', decoded?.role);
+        console.log('verifyToken - decoded.payload?.role:', decoded?.payload?.role);
+        console.log('verifyToken - Object keys:', Object.keys(decoded || {}));
+        
+        // Handle different possible structures
+        // Some JWT libraries return { payload: {...}, header: {...} }
+        // Others return the payload directly
+        if (decoded && typeof decoded === 'object') {
+            // If decoded has a payload property, use that
+            if (decoded.payload) {
+                console.log('verifyToken - Using decoded.payload');
+                return decoded.payload;
+            }
+            // Otherwise, use decoded directly
+            console.log('verifyToken - Using decoded directly');
+            return decoded;
+        }
+        
         return decoded;
     } catch (error) {
+        console.log('verifyToken - Error:', error);
         return null;
     }
 }
@@ -74,6 +96,12 @@ export async function requireAuth(request, env) {
         return { error: 'Invalid token', status: 401 };
     }
     
+    // Log for debugging - log role separately to see full value
+    console.log('requireAuth - Decoded token payload:', JSON.stringify(decoded));
+    console.log('requireAuth - Role value:', decoded.role);
+    console.log('requireAuth - Role type:', typeof decoded.role);
+    console.log('requireAuth - Role === "admin":', decoded.role === 'admin');
+    
     return { user: decoded };
 }
 
@@ -83,12 +111,25 @@ export async function requireAuth(request, env) {
 export async function requireAdmin(request, env) {
     const authResult = await requireAuth(request, env);
     if (authResult.error) {
+        console.log('requireAdmin - Auth failed:', authResult.error);
         return authResult;
     }
     
-    if (authResult.user.role !== 'admin') {
+    // Check role - handle different possible formats
+    const role = authResult.user?.role;
+    const roleString = String(role || '').trim();
+    
+    console.log('requireAdmin - Raw role:', role);
+    console.log('requireAdmin - Role type:', typeof role);
+    console.log('requireAdmin - Role string:', roleString);
+    console.log('requireAdmin - Role === "admin":', roleString === 'admin');
+    console.log('requireAdmin - Full user object:', JSON.stringify(authResult.user));
+    
+    if (roleString !== 'admin') {
+        console.log('requireAdmin - Admin check FAILED. Role:', roleString, 'Expected: admin');
         return { error: 'Forbidden', status: 403 };
     }
     
+    console.log('requireAdmin - Admin check PASSED');
     return authResult;
 }

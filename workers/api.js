@@ -44,6 +44,38 @@ export default {
                 return await handleAdminLogin(request, env);
             }
 
+            // Public routes (no authentication required)
+            if (path === '/api/stores' && method === 'GET') {
+                return await handleGetStores(env);
+            }
+            
+            if (path.startsWith('/api/stores/') && method === 'GET') {
+                const id = path.split('/')[3];
+                return await handleGetStore(id, env);
+            }
+            
+            if (path === '/api/coupons' && method === 'GET') {
+                return await handleGetCoupons(env);
+            }
+            
+            if (path.startsWith('/api/coupons/') && method === 'GET') {
+                const id = path.split('/')[3];
+                return await handleGetCoupon(id, env);
+            }
+            
+            if (path === '/api/products' && method === 'GET') {
+                return await handleGetProducts(env);
+            }
+            
+            if (path.startsWith('/api/products/') && method === 'GET') {
+                const id = path.split('/')[3];
+                return await handleGetProduct(id, env);
+            }
+            
+            if (path === '/api/categories' && method === 'GET') {
+                return await handleGetCategories(env);
+            }
+
             // Protected routes (require authentication)
             const authResult = await requireAuth(request, env);
             if (authResult.error) {
@@ -51,9 +83,6 @@ export default {
             }
 
             // User routes
-            if (path === '/api/stores' && method === 'GET') {
-                return await handleGetStores(env);
-            }
             
             if (path === '/api/stores' && method === 'POST') {
                 const adminResult = await requireAdmin(request, env);
@@ -61,11 +90,6 @@ export default {
                     return errorResponse(adminResult.error, adminResult.status);
                 }
                 return await handleCreateStore(request, env);
-            }
-            
-            if (path.startsWith('/api/stores/') && method === 'GET') {
-                const id = path.split('/')[3];
-                return await handleGetStore(id, env);
             }
             
             if (path.startsWith('/api/stores/') && method === 'PUT') {
@@ -87,21 +111,12 @@ export default {
             }
 
             // Coupons routes
-            if (path === '/api/coupons' && method === 'GET') {
-                return await handleGetCoupons(env);
-            }
-            
             if (path === '/api/coupons' && method === 'POST') {
                 const adminResult = await requireAdmin(request, env);
                 if (adminResult.error) {
                     return errorResponse(adminResult.error, adminResult.status);
                 }
                 return await handleCreateCoupon(request, env);
-            }
-            
-            if (path.startsWith('/api/coupons/') && method === 'GET') {
-                const id = path.split('/')[3];
-                return await handleGetCoupon(id, env);
             }
             
             if (path.startsWith('/api/coupons/') && method === 'PUT') {
@@ -123,15 +138,14 @@ export default {
             }
 
             // Categories routes
-            if (path === '/api/categories' && method === 'GET') {
-                return await handleGetCategories(env);
-            }
-            
             if (path === '/api/categories' && method === 'POST') {
                 const adminResult = await requireAdmin(request, env);
                 if (adminResult.error) {
+                    // Log for debugging
+                    console.log('Categories POST - Admin check failed:', adminResult.error, adminResult.status);
                     return errorResponse(adminResult.error, adminResult.status);
                 }
+                console.log('Categories POST - Admin check passed');
                 return await handleCreateCategory(request, env);
             }
 
@@ -144,9 +158,13 @@ export default {
                 return await handleGetUsers(env);
             }
 
-            // Products routes
-            if (path === '/api/products' && method === 'GET') {
-                return await handleGetProducts(env);
+            // Image upload route
+            if (path === '/api/upload' && method === 'POST') {
+                const adminResult = await requireAdmin(request, env);
+                if (adminResult.error) {
+                    return errorResponse(adminResult.error, adminResult.status);
+                }
+                return await handleImageUpload(request, env);
             }
 
             return errorResponse('Not found', 404);
@@ -271,11 +289,18 @@ async function handleAdminLogin(request, env) {
 }
 
 async function handleGetStores(env) {
-    const stores = await env.DB.prepare(
-        'SELECT * FROM stores WHERE status = ? ORDER BY created_at DESC'
-    ).bind('active').all();
+    try {
+        // Get all stores, not just active ones (frontend will filter)
+        const stores = await env.DB.prepare(
+            'SELECT * FROM stores ORDER BY created_at DESC'
+        ).all();
 
-    return jsonResponse({ success: true, data: stores.results || [] });
+        console.log('handleGetStores - Found stores:', stores.results?.length || 0);
+        return jsonResponse({ success: true, data: stores.results || [] });
+    } catch (error) {
+        console.error('handleGetStores error:', error);
+        return errorResponse('Failed to fetch stores: ' + error.message, 500);
+    }
 }
 
 async function handleGetStore(id, env) {
@@ -341,11 +366,18 @@ async function handleDeleteStore(id, env) {
 }
 
 async function handleGetCoupons(env) {
-    const coupons = await env.DB.prepare(
-        'SELECT c.*, s.name as store_name FROM coupons c LEFT JOIN stores s ON c.store_id = s.id WHERE c.is_active = 1 ORDER BY c.created_at DESC'
-    ).all();
+    try {
+        // Get all coupons (frontend will filter active ones)
+        const coupons = await env.DB.prepare(
+            'SELECT * FROM coupons ORDER BY created_at DESC'
+        ).all();
 
-    return jsonResponse({ success: true, data: coupons.results || [] });
+        console.log('handleGetCoupons - Found coupons:', coupons.results?.length || 0);
+        return jsonResponse({ success: true, data: coupons.results || [] });
+    } catch (error) {
+        console.error('handleGetCoupons error:', error);
+        return errorResponse('Failed to fetch coupons: ' + error.message, 500);
+    }
 }
 
 async function handleGetCoupon(id, env) {
@@ -419,22 +451,49 @@ async function handleGetCategories(env) {
 }
 
 async function handleCreateCategory(request, env) {
-    const body = await request.json();
-    const { name, slug, icon, description, sort_order } = body;
+    try {
+        const body = await request.json();
+        const { name, slug, icon, description, sort_order } = body;
 
-    if (!name || !slug) {
-        return errorResponse('Name and slug are required', 400);
+        console.log('handleCreateCategory - Received data:', { name, slug, icon, description, sort_order });
+
+        if (!name || !slug) {
+            return errorResponse('Name and slug are required', 400);
+        }
+
+        // Check if slug already exists
+        const existing = await env.DB.prepare(
+            'SELECT id FROM categories WHERE slug = ?'
+        ).bind(slug).first();
+
+        if (existing) {
+            console.log('handleCreateCategory - Slug already exists:', slug);
+            return errorResponse('Category with this slug already exists', 409);
+        }
+
+        console.log('handleCreateCategory - Inserting category...');
+        const result = await env.DB.prepare(
+            'INSERT INTO categories (name, slug, icon, description, sort_order) VALUES (?, ?, ?, ?, ?)'
+        ).bind(name, slug, icon || '', description || '', sort_order || 0).run();
+
+        console.log('handleCreateCategory - Insert result:', result);
+
+        if (!result.success) {
+            console.error('handleCreateCategory - Insert failed:', result.error);
+            return errorResponse('Failed to create category: ' + (result.error || 'Unknown error'), 500);
+        }
+
+        const newCategory = await env.DB.prepare(
+            'SELECT * FROM categories WHERE id = ?'
+        ).bind(result.meta.last_row_id).first();
+
+        console.log('handleCreateCategory - Created category:', newCategory);
+        return jsonResponse({ success: true, data: newCategory }, 201);
+    } catch (error) {
+        console.error('handleCreateCategory - Exception:', error);
+        console.error('handleCreateCategory - Error stack:', error.stack);
+        return errorResponse('Internal server error: ' + error.message, 500);
     }
-
-    const result = await env.DB.prepare(
-        'INSERT INTO categories (name, slug, icon, description, sort_order) VALUES (?, ?, ?, ?, ?)'
-    ).bind(name, slug, icon || '', description || '', sort_order || 0).run();
-
-    const newCategory = await env.DB.prepare(
-        'SELECT * FROM categories WHERE id = ?'
-    ).bind(result.meta.last_row_id).first();
-
-    return jsonResponse({ success: true, data: newCategory }, 201);
 }
 
 async function handleGetUsers(env) {
@@ -451,4 +510,71 @@ async function handleGetProducts(env) {
     ).all();
 
     return jsonResponse({ success: true, data: products.results || [] });
+}
+
+async function handleGetProduct(id, env) {
+    const product = await env.DB.prepare(
+        'SELECT * FROM products WHERE id = ? AND is_active = 1'
+    ).bind(id).first();
+
+    if (!product) {
+        return errorResponse('Product not found', 404);
+    }
+
+    return jsonResponse({ success: true, data: product });
+}
+
+async function handleImageUpload(request, env) {
+    try {
+        const formData = await request.formData();
+        const file = formData.get('file');
+        
+        if (!file) {
+            return errorResponse('No file provided', 400);
+        }
+
+        // Validate file type
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) {
+            return errorResponse('Invalid file type. Only JPEG, PNG, GIF, and WebP are allowed.', 400);
+        }
+
+        // Validate file size (5MB max)
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        if (file.size > maxSize) {
+            return errorResponse('File too large. Maximum size is 5MB.', 400);
+        }
+
+        // Generate unique filename
+        const timestamp = Date.now();
+        const randomStr = Math.random().toString(36).substring(2, 15);
+        const extension = file.name.split('.').pop();
+        const fileName = `${timestamp}-${randomStr}.${extension}`;
+
+        // Convert file to array buffer
+        const arrayBuffer = await file.arrayBuffer();
+
+        // Upload to R2
+        await env.COUPON_IMAGES.put(fileName, arrayBuffer, {
+            httpMetadata: {
+                contentType: file.type,
+            },
+        });
+
+        // Get public URL
+        const r2PublicUrl = env.R2_PUBLIC_URL || 'https://pub-xxxxx.r2.dev';
+        const imageUrl = `${r2PublicUrl}/${fileName}`;
+
+        console.log('Image uploaded successfully:', imageUrl);
+
+        return jsonResponse({
+            success: true,
+            url: imageUrl,
+            fileName: fileName
+        }, 200);
+
+    } catch (error) {
+        console.error('Image upload error:', error);
+        return errorResponse('Failed to upload image: ' + error.message, 500);
+    }
 }
