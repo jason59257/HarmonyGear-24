@@ -1317,7 +1317,7 @@
                                 <div class="product-card" onclick="redirectToProduct('${product.redirect_url || ''}')">
                                     <div class="deal-badge best-price">${savings}</div>
                                     <div class="product-image">
-                                        <img src="${product.image_url || 'https://via.placeholder.com/200x200?text=Product'}" alt="${product.title}">
+                                        ${product.image_url ? `<img src="${product.image_url}" alt="${product.title}">` : `<div style="width: 100%; height: 200px; background: linear-gradient(135deg, #6B46C1, #9333EA); display: flex; align-items: center; justify-content: center; color: white; font-size: 14px;">${product.title.substring(0, 20)}</div>`}
                                     </div>
                                     <div class="product-title">${product.title}</div>
                                     <div class="product-price">$${product.price.toFixed(2)}</div>
@@ -1363,7 +1363,8 @@
                             return `
                                 <div class="store-card">
                                     <div class="store-logo">
-                                        <img src="${store.logo_url || 'https://via.placeholder.com/120x60?text=' + encodeURIComponent(store.name)}" alt="${store.name}" onerror="this.src='https://via.placeholder.com/120x60?text=' + encodeURIComponent('${store.name}')">
+                                        ${store.logo_url ? `<img src="${store.logo_url}" alt="${store.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
+                                        <div style="${store.logo_url ? 'display: none;' : 'display: flex;'} width: 100%; height: 100%; background: linear-gradient(135deg, #6B46C1, #9333EA); align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold; text-align: center; padding: 5px;">${store.name.substring(0, 15)}</div>
                                     </div>
                                     <div class="store-info">
                                         <h3>${store.name}</h3>
