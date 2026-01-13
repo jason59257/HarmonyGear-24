@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Homepage Categories - Admin Panel</title>
+    <title>Import Homepage Categories - Admin Panel</title>
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/admin/css/admin.css">
     <style>
@@ -14,10 +14,11 @@
             margin: 20px 0;
         }
         .category-item {
-            padding: 10px;
+            padding: 12px;
             border: 1px solid var(--admin-border);
             border-radius: 6px;
             background: white;
+            font-size: 14px;
         }
         .category-item.added {
             background: #d4edda;
@@ -31,7 +32,7 @@
             display: inline-block;
             padding: 2px 8px;
             border-radius: 12px;
-            font-size: 12px;
+            font-size: 11px;
             margin-left: 8px;
         }
         .status-pending {
@@ -95,10 +96,10 @@
                         <path d="M3 12H21M3 6H21M3 18H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </button>
-                <h1>导入主页分类</h1>
+                <h1>Import Homepage Categories</h1>
             </div>
             <div class="admin-header-right">
-                <a href="categories.html" class="admin-btn">返回分类管理</a>
+                <a href="categories.html" class="admin-btn">Back to Categories</a>
                 <div class="admin-user-info">
                     <span id="adminUserEmail">admin@harmonygear24.com</span>
                 </div>
@@ -108,19 +109,19 @@
         <div class="admin-content">
             <div class="admin-card" style="margin-bottom: 20px;">
                 <div class="admin-card-header">
-                    <h2>添加主页分类到后台系统</h2>
+                    <h2>Import Homepage Categories</h2>
                 </div>
                 <div class="admin-card-body">
-                    <p>这个页面会帮你将主页中的所有 19 个分类添加到后台数据库中。</p>
-                    <p style="color: var(--admin-text-light); margin-top: 10px;">点击下面的按钮开始导入，系统会自动检查已存在的分类，避免重复添加。</p>
+                    <p>This page will help you import all 19 categories from the homepage into the backend database.</p>
+                    <p style="color: var(--admin-text-light); margin-top: 10px;">Click the button below to start importing. The system will automatically check for existing categories to avoid duplicates.</p>
                 </div>
             </div>
 
             <div class="admin-card">
                 <div class="admin-card-body">
                     <div style="text-align: center; margin: 30px 0;">
-                        <button class="admin-btn admin-btn-primary" id="importBtn" onclick="importAllCategories()" style="padding: 15px 40px; font-size: 16px;">
-                            📥 一键导入所有分类
+                        <button class="admin-btn admin-btn-primary" id="importBtn" style="padding: 15px 40px; font-size: 16px;">
+                            📥 Import All Categories
                         </button>
                     </div>
                     
@@ -132,26 +133,35 @@
         </div>
     </main>
 
-    <script src="js/admin.js"></script>
+    <script src="/admin/js/admin.js"></script>
     <script type="module">
-        import { CategoryAPI } from './js/api-real.js';
+        import { CategoryAPI } from '/admin/js/api-real.js';
         
         // Check authentication
         const token = localStorage.getItem('authToken') || localStorage.getItem('adminToken');
         if (!token) {
-            window.location.href = 'login.html';
+            window.location.href = '/admin/login.html';
         }
         
         // Set admin email
         const adminEmail = localStorage.getItem('adminEmail');
         if (adminEmail) {
-            document.getElementById('adminUserEmail').textContent = adminEmail;
+            const emailEl = document.getElementById('adminUserEmail');
+            if (emailEl) {
+                emailEl.textContent = adminEmail;
+            }
         }
         
         // Sidebar toggle
-        document.getElementById('adminMenuToggle').addEventListener('click', function() {
-            document.querySelector('.admin-sidebar').classList.toggle('collapsed');
-        });
+        const menuToggle = document.getElementById('adminMenuToggle');
+        if (menuToggle) {
+            menuToggle.addEventListener('click', function() {
+                const sidebar = document.querySelector('.admin-sidebar');
+                if (sidebar) {
+                    sidebar.classList.toggle('collapsed');
+                }
+            });
+        }
         
         const categories = [
             { name: 'Travel & Vacations', slug: 'travel', icon: '✈️', description: 'Travel deals and vacation packages', sort_order: 1 },
@@ -175,102 +185,131 @@
             { name: 'Toys & Games', slug: 'toys', icon: '🎮', description: 'Toys and games', sort_order: 19 }
         ];
         
-        // 显示分类列表
+        // Display categories list
         function renderCategories() {
             const list = document.getElementById('categoryList');
+            if (!list) return;
+            
             list.innerHTML = categories.map(cat => `
                 <div class="category-item" id="cat-${cat.slug}">
                     ${cat.icon} <strong>${cat.name}</strong>
-                    <span class="status-badge status-pending" id="status-${cat.slug}">待添加</span>
+                    <span class="status-badge status-pending" id="status-${cat.slug}">Pending</span>
                 </div>
             `).join('');
         }
         
-        // 导入所有分类
-        window.importAllCategories = async function() {
+        // Import all categories
+        async function importAllCategories() {
             const btn = document.getElementById('importBtn');
             const statusMsg = document.getElementById('statusMessage');
             
+            if (!btn) {
+                console.error('Import button not found');
+                return;
+            }
+            
             btn.disabled = true;
-            btn.textContent = '正在导入...';
-            statusMsg.style.display = 'none';
+            btn.textContent = 'Importing...';
+            if (statusMsg) {
+                statusMsg.style.display = 'none';
+            }
             
             let successCount = 0;
             let errorCount = 0;
             let skipCount = 0;
+            
+            console.log('Starting import...');
             
             for (const category of categories) {
                 const item = document.getElementById(`cat-${category.slug}`);
                 const status = document.getElementById(`status-${category.slug}`);
                 
                 try {
-                    // 先检查是否已存在
+                    // Check if category already exists
                     const allCategories = await CategoryAPI.getAll();
                     const exists = allCategories.success && 
                         allCategories.data && 
                         allCategories.data.some(c => c.slug === category.slug);
                     
                     if (exists) {
-                        item.classList.add('added');
-                        status.textContent = '已存在';
-                        status.className = 'status-badge status-success';
+                        if (item) item.classList.add('added');
+                        if (status) {
+                            status.textContent = 'Exists';
+                            status.className = 'status-badge status-success';
+                        }
                         skipCount++;
+                        console.log(`Skipped (exists): ${category.name}`);
                         continue;
                     }
                     
-                    // 添加分类
+                    // Add category
+                    console.log(`Adding: ${category.name}`);
                     const result = await CategoryAPI.create(category);
                     
                     if (result.success) {
-                        item.classList.add('added');
-                        status.textContent = '已添加';
-                        status.className = 'status-badge status-success';
+                        if (item) item.classList.add('added');
+                        if (status) {
+                            status.textContent = 'Added';
+                            status.className = 'status-badge status-success';
+                        }
                         successCount++;
+                        console.log(`✅ Added: ${category.name}`);
                     } else {
-                        item.classList.add('error');
-                        status.textContent = '失败';
-                        status.className = 'status-badge status-error';
+                        if (item) item.classList.add('error');
+                        if (status) {
+                            status.textContent = 'Failed';
+                            status.className = 'status-badge status-error';
+                        }
                         errorCount++;
-                        console.error(`Failed to add ${category.name}:`, result.error);
+                        console.error(`❌ Failed to add ${category.name}:`, result.error);
                     }
                 } catch (error) {
-                    item.classList.add('error');
-                    status.textContent = '错误';
-                    status.className = 'status-badge status-error';
+                    if (item) item.classList.add('error');
+                    if (status) {
+                        status.textContent = 'Error';
+                        status.className = 'status-badge status-error';
+                    }
                     errorCount++;
-                    console.error(`Error adding ${category.name}:`, error);
+                    console.error(`❌ Error adding ${category.name}:`, error);
                 }
                 
-                // 延迟以避免请求过快
+                // Delay to avoid rate limiting
                 await new Promise(resolve => setTimeout(resolve, 300));
             }
             
-            // 显示结果
-            statusMsg.style.display = 'block';
-            statusMsg.style.background = errorCount > 0 ? '#f8d7da' : '#d4edda';
-            statusMsg.style.color = errorCount > 0 ? '#721c24' : '#155724';
-            statusMsg.innerHTML = `
-                <strong>导入完成！</strong><br>
-                成功: ${successCount} | 跳过: ${skipCount} | 失败: ${errorCount}
-                ${errorCount === 0 ? '<br><a href="categories.html">点击查看分类列表</a>' : ''}
-            `;
+            // Show results
+            if (statusMsg) {
+                statusMsg.style.display = 'block';
+                statusMsg.style.background = errorCount > 0 ? '#f8d7da' : '#d4edda';
+                statusMsg.style.color = errorCount > 0 ? '#721c24' : '#155724';
+                statusMsg.innerHTML = `
+                    <strong>Import Complete!</strong><br>
+                    Success: ${successCount} | Skipped: ${skipCount} | Failed: ${errorCount}
+                    ${errorCount === 0 ? '<br><a href="categories.html" style="color: inherit; text-decoration: underline;">View Categories</a>' : ''}
+                `;
+            }
             
             btn.disabled = false;
-            btn.textContent = '重新导入';
-        };
-        
-        // 初始化
-        renderCategories();
-        
-        // 检查是否已登录
-        const token = localStorage.getItem('authToken') || localStorage.getItem('adminToken');
-        if (!token) {
-            document.getElementById('statusMessage').style.display = 'block';
-            document.getElementById('statusMessage').style.background = '#f8d7da';
-            document.getElementById('statusMessage').style.color = '#721c24';
-            document.getElementById('statusMessage').innerHTML = '请先登录！<a href="login.html">点击登录</a>';
-            document.getElementById('importBtn').disabled = true;
+            btn.textContent = 'Import Again';
+            
+            console.log(`Import complete! Success: ${successCount}, Skipped: ${skipCount}, Failed: ${errorCount}`);
         }
+        
+        // Make function globally accessible
+        window.importAllCategories = importAllCategories;
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            renderCategories();
+            
+            // Attach click handler
+            const importBtn = document.getElementById('importBtn');
+            if (importBtn) {
+                importBtn.addEventListener('click', importAllCategories);
+            } else {
+                console.error('Import button not found on page load');
+            }
+        });
     </script>
 </body>
 </html>
