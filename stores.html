@@ -579,6 +579,28 @@
     <script src="js/main.js"></script>
     <script src="js/auth-modal.js"></script>
     <script src="js/redirect.js"></script>
+    <script>
+        // Immediately clear static content and show loading
+        (function() {
+            const grid = document.getElementById('storesGrid');
+            if (grid) {
+                // Keep only the loading indicator
+                const loadingHtml = `
+                    <div id="storesLoading" style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">
+                        <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #6B46C1; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                        <p style="margin-top: 20px;">加载中...</p>
+                    </div>
+                    <style>
+                        @keyframes spin {
+                            0% { transform: rotate(0deg); }
+                            100% { transform: rotate(360deg); }
+                        }
+                    </style>
+                `;
+                grid.innerHTML = loadingHtml;
+            }
+        })();
+    </script>
     <script type="module">
         import { StoreAPI } from './js/api.js';
         
