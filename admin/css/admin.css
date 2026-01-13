@@ -76,6 +76,45 @@
     color: var(--admin-primary-dark);
 }
 
+/* Ensure form inputs are clickable */
+.admin-login-form input[type="email"],
+.admin-login-form input[type="password"],
+.admin-login-form input[type="text"] {
+    pointer-events: auto !important;
+    position: relative;
+    z-index: 1;
+    cursor: text;
+}
+
+.admin-login-form .form-group-modern {
+    position: relative;
+    z-index: 1;
+}
+
+.admin-login-form .password-input-wrapper {
+    position: relative;
+    z-index: 1;
+}
+
+.admin-login-form .password-input-wrapper input {
+    padding-right: 50px;
+}
+
+.admin-login-form .password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 2;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 /* Admin Body */
 .admin-body {
     display: flex;
