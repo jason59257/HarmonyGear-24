@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Homepage Categories - Admin Panel</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <style>
+        .category-import-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        .category-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .category-item {
+            padding: 10px;
+            border: 1px solid var(--admin-border);
+            border-radius: 6px;
+            background: white;
+        }
+        .category-item.added {
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .category-item.error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body class="admin-body">
+    <div class="category-import-container">
+        <h1>添加主页分类到后台系统</h1>
+        <p>这个页面会帮你将主页中的所有分类添加到后台数据库中。</p>
+        
+        <div style="margin: 20px 0;">
+            <button class="admin-btn admin-btn-primary" id="importBtn" onclick="importAllCategories()">
+                一键导入所有分类
+            </button>
+            <button class="admin-btn" onclick="window.location.href='categories.html'">
+                返回分类管理
+            </button>
+        </div>
+        
+        <div id="statusMessage" style="margin: 20px 0; padding: 15px; border-radius: 6px; display: none;"></div>
+        
+        <div class="category-list" id="categoryList"></div>
+    </div>
+
+    <script type="module">
+        import { CategoryAPI } from './js/api-real.js';
+        
+        const categories = [
+            { name: 'Travel & Vacations', slug: 'travel', icon: '✈️', description: 'Travel deals and vacation packages', sort_order: 1 },
+            { name: 'Clothing', slug: 'clothing', icon: '👕', description: 'Fashion and apparel', sort_order: 2 },
+            { name: 'Beauty & Wellness', slug: 'beauty', icon: '💄', description: 'Beauty products and wellness services', sort_order: 3 },
+            { name: 'Accessories', slug: 'accessories', icon: '👜', description: 'Fashion accessories', sort_order: 4 },
+            { name: 'Auto & Tires', slug: 'auto', icon: '🚗', description: 'Automotive and tire deals', sort_order: 5 },
+            { name: 'Baby & Toddler', slug: 'baby', icon: '👶', description: 'Baby and toddler products', sort_order: 6 },
+            { name: 'Banking & Finance Tools', slug: 'banking', icon: '💳', description: 'Banking and financial services', sort_order: 7 },
+            { name: 'Business Supplies & Services', slug: 'business', icon: '💼', description: 'Business supplies and services', sort_order: 8 },
+            { name: 'Digital Services & Streaming', slug: 'digital', icon: '📱', description: 'Digital services and streaming platforms', sort_order: 9 },
+            { name: 'Electronics', slug: 'electronics', icon: '📺', description: 'Electronics and tech products', sort_order: 10 },
+            { name: 'Events & Entertainment', slug: 'events', icon: '🎭', description: 'Events and entertainment tickets', sort_order: 11 },
+            { name: 'Food, Drinks & Restaurants', slug: 'food', icon: '🍔', description: 'Food, drinks and restaurant deals', sort_order: 12 },
+            { name: 'Gifts, Flowers & Parties', slug: 'gifts', icon: '🎁', description: 'Gifts, flowers and party supplies', sort_order: 13 },
+            { name: 'Home & Garden', slug: 'home', icon: '🏠', description: 'Home and garden products', sort_order: 14 },
+            { name: 'Pets', slug: 'pets', icon: '🐾', description: 'Pet supplies and services', sort_order: 15 },
+            { name: 'Shoes', slug: 'shoes', icon: '👟', description: 'Footwear and shoes', sort_order: 16 },
+            { name: 'Sports, Outdoors & Fitness', slug: 'sports', icon: '⚽', description: 'Sports, outdoor and fitness equipment', sort_order: 17 },
+            { name: 'Subscription Boxes & Services', slug: 'subscription', icon: '📦', description: 'Subscription boxes and services', sort_order: 18 },
+            { name: 'Toys & Games', slug: 'toys', icon: '🎮', description: 'Toys and games', sort_order: 19 }
+        ];
+        
+        // 显示分类列表
+        function renderCategories() {
+            const list = document.getElementById('categoryList');
+            list.innerHTML = categories.map(cat => `
+                <div class="category-item" id="cat-${cat.slug}">
+                    ${cat.icon} <strong>${cat.name}</strong>
+                    <span class="status-badge status-pending" id="status-${cat.slug}">待添加</span>
+                </div>
+            `).join('');
+        }
+        
+        // 导入所有分类
+        window.importAllCategories = async function() {
+            const btn = document.getElementById('importBtn');
+            const statusMsg = document.getElementById('statusMessage');
+            
+            btn.disabled = true;
+            btn.textContent = '正在导入...';
+            statusMsg.style.display = 'none';
+            
+            let successCount = 0;
+            let errorCount = 0;
+            let skipCount = 0;
+            
+            for (const category of categories) {
+                const item = document.getElementById(`cat-${category.slug}`);
+                const status = document.getElementById(`status-${category.slug}`);
+                
+                try {
+                    // 先检查是否已存在
+                    const allCategories = await CategoryAPI.getAll();
+                    const exists = allCategories.success && 
+                        allCategories.data && 
+                        allCategories.data.some(c => c.slug === category.slug);
+                    
+                    if (exists) {
+                        item.classList.add('added');
+                        status.textContent = '已存在';
+                        status.className = 'status-badge status-success';
+                        skipCount++;
+                        continue;
+                    }
+                    
+                    // 添加分类
+                    const result = await CategoryAPI.create(category);
+                    
+                    if (result.success) {
+                        item.classList.add('added');
+                        status.textContent = '已添加';
+                        status.className = 'status-badge status-success';
+                        successCount++;
+                    } else {
+                        item.classList.add('error');
+                        status.textContent = '失败';
+                        status.className = 'status-badge status-error';
+                        errorCount++;
+                        console.error(`Failed to add ${category.name}:`, result.error);
+                    }
+                } catch (error) {
+                    item.classList.add('error');
+                    status.textContent = '错误';
+                    status.className = 'status-badge status-error';
+                    errorCount++;
+                    console.error(`Error adding ${category.name}:`, error);
+                }
+                
+                // 延迟以避免请求过快
+                await new Promise(resolve => setTimeout(resolve, 300));
+            }
+            
+            // 显示结果
+            statusMsg.style.display = 'block';
+            statusMsg.style.background = errorCount > 0 ? '#f8d7da' : '#d4edda';
+            statusMsg.style.color = errorCount > 0 ? '#721c24' : '#155724';
+            statusMsg.innerHTML = `
+                <strong>导入完成！</strong><br>
+                成功: ${successCount} | 跳过: ${skipCount} | 失败: ${errorCount}
+                ${errorCount === 0 ? '<br><a href="categories.html">点击查看分类列表</a>' : ''}
+            `;
+            
+            btn.disabled = false;
+            btn.textContent = '重新导入';
+        };
+        
+        // 初始化
+        renderCategories();
+        
+        // 检查是否已登录
+        const token = localStorage.getItem('authToken') || localStorage.getItem('adminToken');
+        if (!token) {
+            document.getElementById('statusMessage').style.display = 'block';
+            document.getElementById('statusMessage').style.background = '#f8d7da';
+            document.getElementById('statusMessage').style.color = '#721c24';
+            document.getElementById('statusMessage').innerHTML = '请先登录！<a href="login.html">点击登录</a>';
+            document.getElementById('importBtn').disabled = true;
+        }
+    </script>
+</body>
+</html>
