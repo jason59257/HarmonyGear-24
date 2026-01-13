@@ -32,6 +32,22 @@ async function apiRequest(endpoint, options = {}) {
     });
     
     if (!response.ok) {
+        // Handle 401 Unauthorized - token expired or invalid
+        if (response.status === 401) {
+            // Clear tokens and redirect to login
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('adminLoggedIn');
+            localStorage.removeItem('adminEmail');
+            
+            // Only redirect if we're in an admin page
+            if (window.location.pathname.includes('/admin/') && !window.location.pathname.includes('login.html')) {
+                window.location.href = '/admin/login.html';
+            }
+            
+            throw new Error('Unauthorized - Please login again');
+        }
+        
         const error = await response.json().catch(() => ({ error: 'Request failed' }));
         throw new Error(error.error || `HTTP ${response.status}`);
     }
