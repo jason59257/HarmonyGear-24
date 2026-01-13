@@ -1180,19 +1180,56 @@
         window.redirectToProduct = redirectToProduct;
         window.copyCodeAndRedirect = copyCodeAndRedirect;
 
-        document.addEventListener('DOMContentLoaded', async function() {
+        // Immediately clear all static content containers
+        function clearStaticContent() {
+            const containers = [
+                'popularStoresRow',
+                'extraCashBackStores',
+                'dealsRow',
+                'hotDealsGrid',
+                'priceDropsProducts',
+                'featuredStoresGrid',
+                'latestCouponsGrid'
+            ];
+            
+            containers.forEach(id => {
+                const container = document.getElementById(id);
+                if (container) {
+                    container.innerHTML = '';
+                    console.log(`✅ Cleared container: ${id}`);
+                }
+            });
+        }
+
+        // Clear immediately if DOM is ready, otherwise wait for DOMContentLoaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                clearStaticContent();
+                loadHomepageData();
+            });
+        } else {
+            // DOM already loaded
+            clearStaticContent();
+            loadHomepageData();
+        }
+
+        async function loadHomepageData() {
             console.log('🔄 Loading homepage data...');
-            await Promise.all([
-                loadPopularStores(),
-                loadExtraCashBackStores(),
-                loadDealsOfTheWeek(),
-                loadHotDeals(),
-                loadTopPriceDrops(),
-                loadFeaturedStores(),
-                loadLatestCoupons()
-            ]);
-            console.log('✅ Homepage data loaded');
-        });
+            try {
+                await Promise.all([
+                    loadPopularStores(),
+                    loadExtraCashBackStores(),
+                    loadDealsOfTheWeek(),
+                    loadHotDeals(),
+                    loadTopPriceDrops(),
+                    loadFeaturedStores(),
+                    loadLatestCoupons()
+                ]);
+                console.log('✅ Homepage data loaded');
+            } catch (error) {
+                console.error('❌ Error loading homepage data:', error);
+            }
+        }
 
         // Load Popular Stores
         async function loadPopularStores() {
@@ -1241,6 +1278,9 @@
                 }
             } catch (error) {
                 console.error('❌ Error loading popular stores:', error);
+                if (container) {
+                    container.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">加载失败: ' + error.message + '</div>';
+                }
             }
         }
 
