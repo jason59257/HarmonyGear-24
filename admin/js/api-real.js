@@ -6,7 +6,8 @@ import { CONFIG } from './config.js';
 
 // Helper function to get auth token
 function getAuthToken() {
-    return localStorage.getItem('authToken');
+    // Check both possible token names for compatibility
+    return localStorage.getItem('adminToken') || localStorage.getItem('authToken');
 }
 
 // Helper function to make API request

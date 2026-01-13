@@ -210,18 +210,48 @@
             document.getElementById('adminUserEmail').textContent = adminEmail;
         }
         
+        // Check authentication before loading
+        function checkAuth() {
+            const token = localStorage.getItem('adminToken') || localStorage.getItem('authToken');
+            const loggedIn = localStorage.getItem('adminLoggedIn');
+            
+            if (!token && !loggedIn) {
+                window.location.href = 'login.html';
+                return false;
+            }
+            return true;
+        }
+        
         // Load categories
         async function loadCategories() {
+            if (!checkAuth()) return;
+            
             try {
                 const result = await CategoryAPI.getAll();
                 if (result.success) {
                     renderCategories(result.data || []);
                 } else {
-                    showError('Failed to load categories: ' + result.error);
+                    // If unauthorized, redirect to login
+                    if (result.error && result.error.includes('Unauthorized')) {
+                        showError('Session expired. Redirecting to login...');
+                        setTimeout(() => {
+                            window.location.href = 'login.html';
+                        }, 2000);
+                    } else {
+                        showError('Failed to load categories: ' + result.error);
+                    }
                 }
             } catch (error) {
                 console.error('Error loading categories:', error);
-                showError('Failed to load categories');
+                // If unauthorized error, redirect to login
+                if (error.message && error.message.includes('Unauthorized')) {
+                    showError('Session expired. Redirecting to login...');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                } else {
+                    showError('Failed to load categories: ' + error.message);
+                }
             }
         }
         
