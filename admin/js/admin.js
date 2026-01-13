@@ -16,6 +16,7 @@ function checkAdminAuth() {
 // Admin logout
 function adminLogout() {
     if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('authToken');
         localStorage.removeItem('adminLoggedIn');
         localStorage.removeItem('adminEmail');
         window.location.href = 'login.html';
