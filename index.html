@@ -1007,7 +1007,7 @@
 
     <script src="js/main.js"></script>
     <script src="js/auth-modal.js"></script>
-    <script src="js/redirect.js"></script>
+    <!-- redirect.js is loaded as ES6 module below, don't load it as regular script -->
     <script type="module">
         import { StoreAPI, CouponAPI, ProductAPI } from './js/api.js';
         import { redirectToStore, redirectToCoupon, redirectToProduct, copyCodeAndRedirect } from './js/redirect.js';
