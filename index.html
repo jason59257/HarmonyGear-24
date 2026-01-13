@@ -1221,12 +1221,23 @@
         // Load Popular Stores
         async function loadPopularStores() {
             const container = document.getElementById('popularStoresRow');
-            if (!container) return;
+            if (!container) {
+                console.error('❌ popularStoresRow container not found');
+                return;
+            }
+            
+            console.log('🔄 Loading popular stores...');
+            // Clear static content first
+            container.innerHTML = '';
             
             try {
                 const result = await StoreAPI.getAll();
+                console.log('📦 Popular stores API result:', result);
+                
                 if (result.success && result.data && result.data.length > 0) {
                     const stores = result.data.filter(s => s.status === 'active').slice(0, 6);
+                    console.log(`✅ Found ${stores.length} active stores for Popular section`);
+                    
                     if (stores.length > 0) {
                         container.innerHTML = stores.map(store => {
                             const logoUrl = store.logo_url || '';
@@ -1245,22 +1256,38 @@
                                 </div>
                             `;
                         }).join('');
+                    } else {
+                        console.log('⚠️ No active stores found for Popular section');
                     }
+                } else {
+                    console.log('⚠️ No stores data from API:', result);
                 }
             } catch (error) {
-                console.error('Error loading popular stores:', error);
+                console.error('❌ Error loading popular stores:', error);
             }
         }
 
         // Load Extra Cash Back Stores
         async function loadExtraCashBackStores() {
             const container = document.getElementById('extraCashBackStores');
-            if (!container) return;
+            if (!container) {
+                console.error('❌ extraCashBackStores container not found');
+                return;
+            }
+            
+            console.log('🔄 Loading extra cashback stores...');
+            // Clear static content first
+            container.innerHTML = '';
             
             try {
                 const result = await StoreAPI.getAll();
+                console.log('📦 Extra cashback stores API result:', result);
+                
                 if (result.success && result.data && result.data.length > 0) {
-                    const stores = result.data.filter(s => s.status === 'active' && s.cashback > 5).slice(0, 8);
+                    // Remove the cashback > 5 filter to show all active stores
+                    const stores = result.data.filter(s => s.status === 'active').slice(0, 8);
+                    console.log(`✅ Found ${stores.length} active stores for Extra Cash Back section`);
+                    
                     if (stores.length > 0) {
                         container.innerHTML = stores.map(store => {
                             const logoUrl = store.logo_url || '';
@@ -1279,22 +1306,37 @@
                                 </div>
                             `;
                         }).join('');
+                    } else {
+                        console.log('⚠️ No active stores found for Extra Cash Back section');
                     }
+                } else {
+                    console.log('⚠️ No stores data from API:', result);
                 }
             } catch (error) {
-                console.error('Error loading extra cashback stores:', error);
+                console.error('❌ Error loading extra cashback stores:', error);
             }
         }
 
         // Load Deals of the Week
         async function loadDealsOfTheWeek() {
             const container = document.getElementById('dealsRow');
-            if (!container) return;
+            if (!container) {
+                console.error('❌ dealsRow container not found');
+                return;
+            }
+            
+            console.log('🔄 Loading deals of the week...');
+            // Clear static content first
+            container.innerHTML = '';
             
             try {
                 const result = await CouponAPI.getAll();
+                console.log('📦 Deals of the week API result:', result);
+                
                 if (result.success && result.data && result.data.length > 0) {
                     const coupons = result.data.filter(c => c.is_active).slice(0, 4);
+                    console.log(`✅ Found ${coupons.length} active coupons for Deals section`);
+                    
                     if (coupons.length > 0) {
                         // Load stores to get store names
                         const storesResult = await StoreAPI.getAll();
@@ -1323,22 +1365,38 @@
                                 </div>
                             `;
                         }).join('');
+                    } else {
+                        console.log('⚠️ No active coupons found for Deals section');
                     }
+                } else {
+                    console.log('⚠️ No coupons data from API:', result);
                 }
             } catch (error) {
-                console.error('Error loading deals of the week:', error);
+                console.error('❌ Error loading deals of the week:', error);
             }
         }
 
         // Load Hot Deals
         async function loadHotDeals() {
             const container = document.getElementById('hotDealsGrid');
-            if (!container) return;
+            if (!container) {
+                console.error('❌ hotDealsGrid container not found');
+                return;
+            }
+            
+            console.log('🔄 Loading hot deals...');
+            // Clear static content first
+            container.innerHTML = '';
             
             try {
                 const result = await CouponAPI.getAll();
+                console.log('📦 Hot deals API result:', result);
+                
                 if (result.success && result.data && result.data.length > 0) {
-                    const coupons = result.data.filter(c => c.is_active && c.is_featured).slice(0, 4);
+                    // Remove is_featured filter to show all active coupons
+                    const coupons = result.data.filter(c => c.is_active).slice(0, 4);
+                    console.log(`✅ Found ${coupons.length} active coupons for Hot Deals section`);
+                    
                     if (coupons.length > 0) {
                         // Load stores to get store names
                         const storesResult = await StoreAPI.getAll();
@@ -1368,22 +1426,37 @@
                                 </div>
                             `;
                         }).join('');
+                    } else {
+                        console.log('⚠️ No active coupons found for Hot Deals section');
                     }
+                } else {
+                    console.log('⚠️ No coupons data from API:', result);
                 }
             } catch (error) {
-                console.error('Error loading hot deals:', error);
+                console.error('❌ Error loading hot deals:', error);
             }
         }
 
         // Load Top Price Drops
         async function loadTopPriceDrops() {
             const container = document.getElementById('priceDropsProducts');
-            if (!container) return;
+            if (!container) {
+                console.error('❌ priceDropsProducts container not found');
+                return;
+            }
+            
+            console.log('🔄 Loading top price drops...');
+            // Clear static content first
+            container.innerHTML = '';
             
             try {
                 const result = await ProductAPI.getAll();
+                console.log('📦 Top price drops API result:', result);
+                
                 if (result.success && result.data && result.data.length > 0) {
                     const products = result.data.filter(p => p.is_active).slice(0, 6);
+                    console.log(`✅ Found ${products.length} active products for Top Price Drops section`);
+                    
                     if (products.length > 0) {
                         container.innerHTML = products.map(product => {
                             const savings = product.savings_percent ? `Save ${product.savings_percent}%` : 'Deal';
@@ -1402,22 +1475,37 @@
                                 </div>
                             `;
                         }).join('');
+                    } else {
+                        console.log('⚠️ No active products found for Top Price Drops section');
                     }
+                } else {
+                    console.log('⚠️ No products data from API:', result);
                 }
             } catch (error) {
-                console.error('Error loading top price drops:', error);
+                console.error('❌ Error loading top price drops:', error);
             }
         }
 
         // Load Featured Stores
         async function loadFeaturedStores() {
             const container = document.getElementById('featuredStoresGrid');
-            if (!container) return;
+            if (!container) {
+                console.error('❌ featuredStoresGrid container not found');
+                return;
+            }
+            
+            console.log('🔄 Loading featured stores...');
+            // Clear static content first
+            container.innerHTML = '';
             
             try {
                 const result = await StoreAPI.getAll();
+                console.log('📦 Featured stores API result:', result);
+                
                 if (result.success && result.data && result.data.length > 0) {
                     const stores = result.data.filter(s => s.status === 'active').slice(0, 6);
+                    console.log(`✅ Found ${stores.length} active stores for Featured Stores section`);
+                    
                     if (stores.length > 0) {
                         container.innerHTML = stores.map(store => {
                             const cashback = store.cashback ? `${store.cashback}% Cash Back` : 'Cash Back Available';
