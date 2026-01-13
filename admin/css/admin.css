@@ -76,43 +76,75 @@
     color: var(--admin-primary-dark);
 }
 
-/* Ensure form inputs are clickable */
+/* Ensure form inputs are clickable - Strong rules */
+.admin-login-form,
+.admin-login-form * {
+    pointer-events: auto !important;
+}
+
 .admin-login-form input[type="email"],
 .admin-login-form input[type="password"],
 .admin-login-form input[type="text"] {
     pointer-events: auto !important;
-    position: relative;
-    z-index: 1;
-    cursor: text;
+    position: relative !important;
+    z-index: 1000 !important;
+    cursor: text !important;
+    background: white !important;
+    -webkit-user-select: text !important;
+    user-select: text !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.admin-login-form input[type="email"]:focus,
+.admin-login-form input[type="password"]:focus,
+.admin-login-form input[type="text"]:focus {
+    pointer-events: auto !important;
+    z-index: 1001 !important;
 }
 
 .admin-login-form .form-group-modern {
-    position: relative;
-    z-index: 1;
+    position: relative !important;
+    z-index: 10 !important;
+    pointer-events: auto !important;
 }
 
 .admin-login-form .password-input-wrapper {
-    position: relative;
-    z-index: 1;
+    position: relative !important;
+    z-index: 10 !important;
+    pointer-events: auto !important;
 }
 
 .admin-login-form .password-input-wrapper input {
-    padding-right: 50px;
+    padding-right: 50px !important;
+    pointer-events: auto !important;
 }
 
 .admin-login-form .password-toggle {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    cursor: pointer;
-    z-index: 2;
-    padding: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: absolute !important;
+    right: 12px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    background: none !important;
+    border: none !important;
+    cursor: pointer !important;
+    z-index: 1001 !important;
+    padding: 4px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    pointer-events: auto !important;
+}
+
+/* Remove any overlay that might block inputs */
+.admin-login-page::before,
+.admin-login-page::after,
+.admin-login-container::before,
+.admin-login-container::after,
+.admin-login-card::before,
+.admin-login-card::after {
+    display: none !important;
+    pointer-events: none !important;
 }
 
 /* Admin Body */

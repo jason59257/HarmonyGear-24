@@ -16,17 +16,19 @@
                 <p>Sign in to manage your platform</p>
             </div>
             
-            <form id="adminLoginForm" class="admin-login-form">
-                <div class="form-group-modern">
+            <form id="adminLoginForm" class="admin-login-form" style="position: relative; z-index: 10;">
+                <div class="form-group-modern" style="position: relative; z-index: 10;">
                     <label for="adminEmail">Email Address</label>
-                    <input type="email" id="adminEmail" name="email" placeholder="admin@harmonygear24.com" required>
+                    <input type="email" id="adminEmail" name="email" placeholder="admin@harmonygear24.com" required 
+                           style="pointer-events: auto !important; position: relative; z-index: 10; cursor: text !important; background: white !important;">
                 </div>
                 
-                <div class="form-group-modern">
+                <div class="form-group-modern" style="position: relative; z-index: 10;">
                     <label for="adminPassword">Password</label>
-                    <div class="password-input-wrapper">
-                        <input type="password" id="adminPassword" name="password" placeholder="Enter your password" required>
-                        <button type="button" class="password-toggle" onclick="togglePassword('adminPassword')">
+                    <div class="password-input-wrapper" style="position: relative; z-index: 10;">
+                        <input type="password" id="adminPassword" name="password" placeholder="Enter your password" required
+                               style="pointer-events: auto !important; position: relative; z-index: 10; cursor: text !important; background: white !important; padding-right: 50px;">
+                        <button type="button" class="password-toggle" onclick="togglePassword('adminPassword')" style="pointer-events: auto !important; z-index: 11;">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="eye-icon">
                                 <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                 <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
@@ -57,11 +59,43 @@
 
     <script src="/admin/js/admin.js"></script>
     <script>
+        // Ensure inputs are enabled when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const emailInput = document.getElementById('adminEmail');
+            const passwordInput = document.getElementById('adminPassword');
+            
+            // Force enable inputs
+            if (emailInput) {
+                emailInput.disabled = false;
+                emailInput.readOnly = false;
+                emailInput.style.pointerEvents = 'auto';
+                emailInput.style.cursor = 'text';
+                emailInput.removeAttribute('readonly');
+                emailInput.removeAttribute('disabled');
+            }
+            
+            if (passwordInput) {
+                passwordInput.disabled = false;
+                passwordInput.readOnly = false;
+                passwordInput.style.pointerEvents = 'auto';
+                passwordInput.style.cursor = 'text';
+                passwordInput.removeAttribute('readonly');
+                passwordInput.removeAttribute('disabled');
+            }
+            
+            // Test if inputs are focusable
+            console.log('Email input:', emailInput);
+            console.log('Password input:', passwordInput);
+        });
+
         function togglePassword(inputId) {
             const input = document.getElementById(inputId);
-            const button = input.nextElementSibling;
-            const eyeIcon = button.querySelector('.eye-icon');
-            const eyeOffIcon = button.querySelector('.eye-off-icon');
+            if (!input) return;
+            
+            const wrapper = input.closest('.password-input-wrapper');
+            const button = wrapper ? wrapper.querySelector('.password-toggle') : null;
+            const eyeIcon = button ? button.querySelector('.eye-icon') : null;
+            const eyeOffIcon = button ? button.querySelector('.eye-off-icon') : null;
             
             if (input.type === 'password') {
                 input.type = 'text';
@@ -74,20 +108,23 @@
             }
         }
 
-        document.getElementById('adminLoginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const email = document.getElementById('adminEmail').value;
-            const password = document.getElementById('adminPassword').value;
-            
-            // Demo login - in production, this would connect to backend
-            if (email && password) {
-                localStorage.setItem('adminLoggedIn', 'true');
-                localStorage.setItem('adminEmail', email);
-                window.location.href = 'dashboard.html';
-            } else {
-                alert('Please enter email and password');
-            }
-        });
+        const loginForm = document.getElementById('adminLoginForm');
+        if (loginForm) {
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = document.getElementById('adminEmail').value;
+                const password = document.getElementById('adminPassword').value;
+                
+                // Demo login - in production, this would connect to backend
+                if (email && password) {
+                    localStorage.setItem('adminLoggedIn', 'true');
+                    localStorage.setItem('adminEmail', email);
+                    window.location.href = 'dashboard.html';
+                } else {
+                    alert('Please enter email and password');
+                }
+            });
+        }
     </script>
 </body>
 </html>
