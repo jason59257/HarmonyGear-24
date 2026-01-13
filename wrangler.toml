@@ -9,8 +9,8 @@ compatibility_date = "2024-01-01"
 # Replace 'database_id' with your actual D1 database ID from: wrangler d1 list
 [[d1_databases]]
 binding = "DB"
-database_name = "coupon-db"
-database_id = "YOUR_DATABASE_ID_HERE"  # ⬅️ 替换为你的 database_id
+database_name = "harmonygear24"
+database_id = "9fd2988d-5c5e-4ec1-97b4-d0f5f5eb1a3e"
 
 # R2 bucket binding
 # Replace 'coupon-images' with your actual R2 bucket name
@@ -24,4 +24,4 @@ bucket_name = "coupon-images"
 # Or use your custom domain: https://images.yourdomain.com
 [vars]
 R2_PUBLIC_URL = "https://pub-xxxxx.r2.dev"  # Replace with your R2 public domain
-JWT_SECRET = "YOUR_JWT_SECRET_HERE"  # ⬅️ 替换为生成的 JWT_SECRET（稍后生成）
+JWT_SECRET = "be51986f1736f29c2fd811fe1b9087e824cb41ea3003da068bba8a0606e82599"
