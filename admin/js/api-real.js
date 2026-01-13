@@ -197,15 +197,28 @@ export const CategoryAPI = {
     },
 
     async update(id, categoryData) {
-        // Note: Update endpoint not implemented in API yet
-        // For now, return success (you can implement this later)
-        return { success: true, data: { ...categoryData, id } };
+        try {
+            const result = await apiRequest(`/api/categories/${id}`, {
+                method: 'PUT',
+                body: JSON.stringify(categoryData),
+            });
+            return result;
+        } catch (error) {
+            console.error('CategoryAPI.update error:', error);
+            return { success: false, error: error.message };
+        }
     },
 
     async delete(id) {
-        // Note: Delete endpoint not implemented in API yet
-        // For now, return success (you can implement this later)
-        return { success: true };
+        try {
+            const result = await apiRequest(`/api/categories/${id}`, {
+                method: 'DELETE',
+            });
+            return result;
+        } catch (error) {
+            console.error('CategoryAPI.delete error:', error);
+            return { success: false, error: error.message };
+        }
     }
 };
 

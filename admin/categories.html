@@ -201,9 +201,9 @@
     </main>
 
     <script src="js/admin.js"></script>
+    <script src="js/modal.js"></script>
     <script type="module">
         import { CategoryAPI } from './js/api-real.js';
-        import { Modal } from './js/modal.js';
         
         const adminEmail = localStorage.getItem('adminEmail');
         if (adminEmail) {
@@ -236,15 +236,21 @@
             
             tbody.innerHTML = categories.map(category => `
                 <tr>
-                    <td>${category.id}</td>
-                    <td>${category.icon || '📁'} ${category.name || 'N/A'}</td>
+                    <td>${category.icon || '📁'} <strong>${category.name || 'N/A'}</strong></td>
                     <td>${category.slug || 'N/A'}</td>
-                    <td>${category.description || 'No description'}</td>
+                    <td>0</td>
+                    <td><span class="admin-badge success">Active</span></td>
                     <td>
                         <button class="admin-btn-icon" title="Edit" onclick="editCategory(${category.id})">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="currentColor" stroke-width="2"/>
                                 <path d="M18.5 2.5C18.8978 2.10217 19.4374 1.87868 20 1.87868C20.5626 1.87868 21.1022 2.10217 21.5 2.5C21.8978 2.89782 22.1213 3.43739 22.1213 4C22.1213 4.56261 21.8978 5.10217 21.5 5.5L12 15L8 16L9 12L18.5 2.5Z" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        </button>
+                        <button class="admin-btn-icon" title="Delete" onclick="deleteCategory(${category.id}, '${category.name || ''}')" style="color: var(--admin-danger);">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 6H5H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                         </button>
                     </td>
@@ -260,51 +266,129 @@
         }
         
         async function showAddCategoryModal() {
-            const modal = new Modal('Add Category', `
-                <form id="addCategoryForm">
-                    <div class="admin-form-group">
-                        <label>Category Name *</label>
-                        <input type="text" name="name" required>
-                    </div>
-                    <div class="admin-form-group">
-                        <label>Slug *</label>
-                        <input type="text" name="slug" required placeholder="e.g., electronics">
-                    </div>
-                    <div class="admin-form-group">
-                        <label>Icon</label>
-                        <input type="text" name="icon" placeholder="e.g., 📱">
-                    </div>
-                    <div class="admin-form-group">
-                        <label>Description</label>
-                        <textarea name="description" rows="3"></textarea>
-                    </div>
-                    <div class="admin-form-group">
-                        <label>Sort Order</label>
-                        <input type="number" name="sort_order" value="0">
-                    </div>
-                </form>
-            `);
-            
-            modal.onSubmit(async (formData) => {
-                const result = await CategoryAPI.create(formData);
-                if (result.success) {
-                    showAdminNotification('Category added successfully', 'success');
-                    modal.close();
-                    loadCategories();
-                } else {
-                    alert('Error: ' + result.error);
+            showModal({
+                title: 'Add Category',
+                content: `
+                    <form id="addCategoryForm">
+                        <div class="admin-form-group">
+                            <label>Category Name *</label>
+                            <input type="text" name="name" required>
+                        </div>
+                        <div class="admin-form-group">
+                            <label>Slug *</label>
+                            <input type="text" name="slug" required placeholder="e.g., electronics">
+                        </div>
+                        <div class="admin-form-group">
+                            <label>Icon</label>
+                            <input type="text" name="icon" placeholder="e.g., 📱">
+                        </div>
+                        <div class="admin-form-group">
+                            <label>Description</label>
+                            <textarea name="description" rows="3"></textarea>
+                        </div>
+                        <div class="admin-form-group">
+                            <label>Sort Order</label>
+                            <input type="number" name="sort_order" value="0">
+                        </div>
+                    </form>
+                `,
+                onSubmit: async () => {
+                    const formData = getFormData('addCategoryForm');
+                    if (!formData) return false;
+                    
+                    const result = await CategoryAPI.create(formData);
+                    if (result.success) {
+                        showAdminNotification('Category added successfully', 'success');
+                        loadCategories();
+                        return true;
+                    } else {
+                        alert('Error: ' + result.error);
+                        return false;
+                    }
                 }
             });
+        }
+        
+        async function editCategory(id) {
+            try {
+                const result = await CategoryAPI.getById(id);
+                if (!result.success || !result.data) {
+                    showAdminNotification('Category not found', 'danger');
+                    return;
+                }
+                
+                const category = result.data;
+                
+                showModal({
+                    title: 'Edit Category',
+                    content: `
+                        <form id="editCategoryForm">
+                            <div class="admin-form-group">
+                                <label>Category Name *</label>
+                                <input type="text" name="name" value="${(category.name || '').replace(/"/g, '&quot;')}" required>
+                            </div>
+                            <div class="admin-form-group">
+                                <label>Slug *</label>
+                                <input type="text" name="slug" value="${(category.slug || '').replace(/"/g, '&quot;')}" required placeholder="e.g., electronics">
+                            </div>
+                            <div class="admin-form-group">
+                                <label>Icon</label>
+                                <input type="text" name="icon" value="${(category.icon || '').replace(/"/g, '&quot;')}" placeholder="e.g., 📱">
+                            </div>
+                            <div class="admin-form-group">
+                                <label>Description</label>
+                                <textarea name="description" rows="3">${(category.description || '').replace(/"/g, '&quot;')}</textarea>
+                            </div>
+                            <div class="admin-form-group">
+                                <label>Sort Order</label>
+                                <input type="number" name="sort_order" value="${category.sort_order || 0}">
+                            </div>
+                        </form>
+                    `,
+                    onSubmit: async () => {
+                        const formData = getFormData('editCategoryForm');
+                        if (!formData) return false;
+                        
+                        const updateResult = await CategoryAPI.update(id, formData);
+                        if (updateResult.success) {
+                            showAdminNotification('Category updated successfully', 'success');
+                            loadCategories();
+                            return true;
+                        } else {
+                            alert('Error: ' + updateResult.error);
+                            return false;
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading category:', error);
+                showAdminNotification('Failed to load category', 'danger');
+            }
+        }
+        
+        async function deleteCategory(id, name) {
+            if (!confirm(`Are you sure you want to delete "${name}"? This action cannot be undone.`)) {
+                return;
+            }
             
-            modal.show();
+            try {
+                const result = await CategoryAPI.delete(id);
+                if (result.success) {
+                    showAdminNotification('Category deleted successfully', 'success');
+                    loadCategories();
+                } else {
+                    showAdminNotification('Error: ' + result.error, 'danger');
+                }
+            } catch (error) {
+                console.error('Error deleting category:', error);
+                showAdminNotification('Failed to delete category', 'danger');
+            }
         }
         
-        function editCategory(id) {
-            alert('Edit category ID: ' + id + '\n(This feature can be implemented later)');
-        }
-        
-        // Make function global
+        // Make functions global
         window.showAddCategoryModal = showAddCategoryModal;
+        window.editCategory = editCategory;
+        window.deleteCategory = deleteCategory;
         
         // Load categories when page loads
         document.addEventListener('DOMContentLoaded', function() {
