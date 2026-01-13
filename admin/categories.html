@@ -201,15 +201,115 @@
     </main>
 
     <script src="js/admin.js"></script>
-    <script>
+    <script type="module">
+        import { CategoryAPI } from './js/api-real.js';
+        import { Modal } from './js/modal.js';
+        
         const adminEmail = localStorage.getItem('adminEmail');
         if (adminEmail) {
             document.getElementById('adminUserEmail').textContent = adminEmail;
         }
-
-        function showAddCategoryModal() {
-            alert('Add Category functionality will be implemented');
+        
+        // Load categories
+        async function loadCategories() {
+            try {
+                const result = await CategoryAPI.getAll();
+                if (result.success) {
+                    renderCategories(result.data || []);
+                } else {
+                    showError('Failed to load categories: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error loading categories:', error);
+                showError('Failed to load categories');
+            }
         }
+        
+        function renderCategories(categories) {
+            const tbody = document.querySelector('.admin-table tbody');
+            if (!tbody) return;
+            
+            if (categories.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">No categories yet. <button class="admin-btn admin-btn-primary" onclick="showAddCategoryModal()">Add Category</button></td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = categories.map(category => `
+                <tr>
+                    <td>${category.id}</td>
+                    <td>${category.icon || '📁'} ${category.name || 'N/A'}</td>
+                    <td>${category.slug || 'N/A'}</td>
+                    <td>${category.description || 'No description'}</td>
+                    <td>
+                        <button class="admin-btn-icon" title="Edit" onclick="editCategory(${category.id})">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="currentColor" stroke-width="2"/>
+                                <path d="M18.5 2.5C18.8978 2.10217 19.4374 1.87868 20 1.87868C20.5626 1.87868 21.1022 2.10217 21.5 2.5C21.8978 2.89782 22.1213 3.43739 22.1213 4C22.1213 4.56261 21.8978 5.10217 21.5 5.5L12 15L8 16L9 12L18.5 2.5Z" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function showError(message) {
+            const tbody = document.querySelector('.admin-table tbody');
+            if (tbody) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px; color: var(--admin-danger);">${message}</td></tr>`;
+            }
+        }
+        
+        async function showAddCategoryModal() {
+            const modal = new Modal('Add Category', `
+                <form id="addCategoryForm">
+                    <div class="admin-form-group">
+                        <label>Category Name *</label>
+                        <input type="text" name="name" required>
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Slug *</label>
+                        <input type="text" name="slug" required placeholder="e.g., electronics">
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Icon</label>
+                        <input type="text" name="icon" placeholder="e.g., 📱">
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Description</label>
+                        <textarea name="description" rows="3"></textarea>
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Sort Order</label>
+                        <input type="number" name="sort_order" value="0">
+                    </div>
+                </form>
+            `);
+            
+            modal.onSubmit(async (formData) => {
+                const result = await CategoryAPI.create(formData);
+                if (result.success) {
+                    showAdminNotification('Category added successfully', 'success');
+                    modal.close();
+                    loadCategories();
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            });
+            
+            modal.show();
+        }
+        
+        function editCategory(id) {
+            alert('Edit category ID: ' + id + '\n(This feature can be implemented later)');
+        }
+        
+        // Make function global
+        window.showAddCategoryModal = showAddCategoryModal;
+        
+        // Load categories when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCategories();
+        });
     </script>
 </body>
 </html>
