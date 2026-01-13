@@ -1144,7 +1144,11 @@
                     
                     if (stores.length > 0) {
                         container.innerHTML = stores.map(store => {
-                            const logoUrl = store.logo_url || '';
+                            // Skip placeholder.com URLs
+                            let logoUrl = store.logo_url || '';
+                            if (logoUrl && logoUrl.includes('via.placeholder.com')) {
+                                logoUrl = '';
+                            }
                             const bgColor = getRandomColor();
                             const cashback = store.cashback ? `${store.cashback}% Cash Back` : 'Cash Back Available';
                             const cashbackWas = store.cashback_was ? `<span class="cashback-was"> was ${store.cashback_was}%</span>` : '';
@@ -1152,7 +1156,8 @@
                             return `
                                 <div class="store-card-compact" onclick="redirectToStore('${store.redirect_url || ''}', '${store.name}')">
                                     <div class="store-card-bg" style="background-color: ${bgColor};">
-                                        ${logoUrl ? `<img src="${logoUrl}" alt="${store.name}" class="store-logo-img-compact" style="width: 100%; height: 100%; object-fit: contain; padding: 10px;">` : `<div class="store-logo-compact">${store.name}</div>`}
+                                        ${logoUrl ? `<img src="${logoUrl}" alt="${store.name}" class="store-logo-img-compact" style="width: 100%; height: 100%; object-fit: contain; padding: 10px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
+                                        <div class="store-logo-compact" style="${logoUrl ? 'display: none;' : 'display: flex;'}">${store.name}</div>
                                     </div>
                                     <div class="store-cashback-info">
                                         <span class="cashback-current">${cashback}</span>${cashbackWas}
@@ -1310,6 +1315,11 @@
                     
                     if (products.length > 0) {
                         container.innerHTML = products.map(product => {
+                            // Skip placeholder.com URLs
+                            let imageUrl = product.image_url || '';
+                            if (imageUrl && imageUrl.includes('via.placeholder.com')) {
+                                imageUrl = '';
+                            }
                             const savings = product.savings_percent ? `Save ${product.savings_percent}%` : 'Deal';
                             const savingsAmount = product.savings_amount ? `($${product.savings_amount.toFixed(2)})` : '';
                             
@@ -1317,7 +1327,8 @@
                                 <div class="product-card" onclick="redirectToProduct('${product.redirect_url || ''}')">
                                     <div class="deal-badge best-price">${savings}</div>
                                     <div class="product-image">
-                                        ${product.image_url ? `<img src="${product.image_url}" alt="${product.title}">` : `<div style="width: 100%; height: 200px; background: linear-gradient(135deg, #6B46C1, #9333EA); display: flex; align-items: center; justify-content: center; color: white; font-size: 14px;">${product.title.substring(0, 20)}</div>`}
+                                        ${imageUrl ? `<img src="${imageUrl}" alt="${product.title}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
+                                        <div style="${imageUrl ? 'display: none;' : 'display: flex;'} width: 100%; height: 200px; background: linear-gradient(135deg, #6B46C1, #9333EA); align-items: center; justify-content: center; color: white; font-size: 14px; text-align: center; padding: 10px;">${product.title.substring(0, 20)}</div>
                                     </div>
                                     <div class="product-title">${product.title}</div>
                                     <div class="product-price">$${product.price.toFixed(2)}</div>
@@ -1358,13 +1369,18 @@
                     
                     if (stores.length > 0) {
                         container.innerHTML = stores.map(store => {
+                            // Skip placeholder.com URLs
+                            let logoUrl = store.logo_url || '';
+                            if (logoUrl && logoUrl.includes('via.placeholder.com')) {
+                                logoUrl = '';
+                            }
                             const cashback = store.cashback ? `${store.cashback}% Cash Back` : 'Cash Back Available';
                             
                             return `
                                 <div class="store-card">
                                     <div class="store-logo">
-                                        ${store.logo_url ? `<img src="${store.logo_url}" alt="${store.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
-                                        <div style="${store.logo_url ? 'display: none;' : 'display: flex;'} width: 100%; height: 100%; background: linear-gradient(135deg, #6B46C1, #9333EA); align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold; text-align: center; padding: 5px;">${store.name.substring(0, 15)}</div>
+                                        ${logoUrl ? `<img src="${logoUrl}" alt="${store.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
+                                        <div style="${logoUrl ? 'display: none;' : 'display: flex;'} width: 100%; height: 100%; background: linear-gradient(135deg, #6B46C1, #9333EA); align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold; text-align: center; padding: 5px;">${store.name.substring(0, 15)}</div>
                                     </div>
                                     <div class="store-info">
                                         <h3>${store.name}</h3>
