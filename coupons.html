@@ -222,13 +222,40 @@
 
     <script src="js/main.js"></script>
     <script src="js/redirect.js"></script>
+    <script>
+        // Immediately clear static content and show loading
+        (function() {
+            const grid = document.getElementById('couponsGrid');
+            if (grid) {
+                // Keep only the loading indicator
+                const loadingHtml = `
+                    <div id="couponsLoading" style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">
+                        <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #6B46C1; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                        <p style="margin-top: 20px;">加载中...</p>
+                    </div>
+                    <style>
+                        @keyframes spin {
+                            0% { transform: rotate(0deg); }
+                            100% { transform: rotate(360deg); }
+                        }
+                    </style>
+                `;
+                grid.innerHTML = loadingHtml;
+            }
+        })();
+    </script>
     <script type="module">
         import { CouponAPI, StoreAPI } from './js/api.js';
         
         // Load coupons from API
         async function loadCoupons() {
+            const grid = document.getElementById('couponsGrid');
+            
             try {
+                console.log('Loading coupons from API...');
                 const result = await CouponAPI.getAll();
+                console.log('CouponAPI.getAll result:', result);
+                
                 if (result.success && result.data && result.data.length > 0) {
                     // Also load stores to get store names
                     const storesResult = await StoreAPI.getAll();
@@ -242,16 +269,14 @@
                 } else {
                     console.log('No coupons found or API error:', result.error);
                     // Show empty state
-                    const grid = document.getElementById('couponsGrid');
                     if (grid) {
-                        grid.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">暂无优惠券</div>';
+                        grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">暂无优惠券</div>';
                     }
                 }
             } catch (error) {
                 console.error('Error loading coupons:', error);
-                const grid = document.getElementById('couponsGrid');
                 if (grid) {
-                    grid.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">加载优惠券失败</div>';
+                    grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">加载优惠券失败，请刷新页面重试</div>';
                 }
             }
         }
