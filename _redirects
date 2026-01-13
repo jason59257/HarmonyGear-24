@@ -1,0 +1,8 @@
+# Cloudflare Pages redirects and rewrites
+# This file ensures admin pages are accessible
+
+# Redirect /admin to /admin/ (with trailing slash)
+/admin /admin/ 301
+
+# Ensure admin pages are accessible
+/admin/* /admin/:splat 200
