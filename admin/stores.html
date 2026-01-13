@@ -269,7 +269,7 @@
                 <tr>
                     <td><strong>${store.name}</strong></td>
                     <td>${store.category || 'N/A'}</td>
-                    <td>${store.cashback}%</td>
+                    <td>${store.cashback ? store.cashback + '%' : 'N/A'}</td>
                     <td><span class="admin-badge ${store.status === 'active' ? 'success' : 'danger'}">${store.status || 'active'}</span></td>
                     <td>
                         <button class="admin-btn-icon" title="Edit" onclick="window.editStore(${store.id})">
@@ -298,8 +298,7 @@
                 <form id="storeForm">
                     ${createFormField('Store Name', 'name', 'text', '', { placeholder: 'Enter store name', required: true })}
                     ${createFormField('Category', 'category', 'select', '', { required: true, options: categoryOptions })}
-                    ${createFormField('Cashback Rate (%)', 'cashback', 'number', '', { placeholder: 'e.g., 5', required: true })}
-                    ${createFormField('Website URL', 'website_url', 'url', '', { placeholder: 'https://example.com', required: true })}
+                    ${createFormField('Cashback Rate (%)', 'cashback', 'number', '', { placeholder: 'e.g., 5', required: false })}
                     ${createFormField('Redirect/Affiliate Link', 'redirect_url', 'url', '', { placeholder: 'https://example.com/affiliate-link (用户点击商店后跳转的链接)', required: true })}
                     <div class="admin-form-group">
                         <label class="admin-form-label">Store Logo</label>
@@ -366,8 +365,7 @@
                         <form id="storeForm">
                             ${createFormField('Store Name', 'name', 'text', store.name || '', { placeholder: 'Enter store name', required: true })}
                             ${createFormField('Category', 'category', 'select', store.category || '', { required: true, options: categoryOptions })}
-                            ${createFormField('Cashback Rate (%)', 'cashback', 'number', store.cashback || '', { placeholder: 'e.g., 5', required: true })}
-                            ${createFormField('Website URL', 'website_url', 'url', store.website_url || '', { placeholder: 'https://example.com', required: true })}
+                            ${createFormField('Cashback Rate (%)', 'cashback', 'number', store.cashback || '', { placeholder: 'e.g., 5', required: false })}
                             ${createFormField('Redirect/Affiliate Link', 'redirect_url', 'url', store.redirect_url || '', { placeholder: 'https://example.com/affiliate-link (用户点击商店后跳转的链接)', required: true })}
                             <div class="admin-form-group">
                                 <label class="admin-form-label">Store Logo</label>
@@ -442,15 +440,16 @@
         async function handleStoreSubmit() {
             if (!validateForm('storeForm', {
                 name: { required: true },
-                cashback: { required: true, pattern: /^\d+(\.\d{1,2})?$/, message: 'Cashback must be a valid number' },
-                website_url: { required: true, pattern: /^https?:\/\/.+/, message: 'Website URL must be a valid URL' },
+                cashback: { required: false, pattern: /^\d+(\.\d{1,2})?$/, message: 'Cashback must be a valid number' },
                 redirect_url: { required: true, pattern: /^https?:\/\/.+/, message: 'Redirect URL must be a valid URL' }
             })) {
                 return false;
             }
 
             const formData = getFormData('storeForm');
-            formData.cashback = parseFloat(formData.cashback);
+            if (formData.cashback) {
+                formData.cashback = parseFloat(formData.cashback);
+            }
             
             // Get logo URL from upload component
             const logoUploadContainer = document.getElementById('storeLogoUpload');
