@@ -1523,22 +1523,37 @@
                                 </div>
                             `;
                         }).join('');
+                    } else {
+                        console.log('⚠️ No active stores found for Featured Stores section');
                     }
+                } else {
+                    console.log('⚠️ No stores data from API:', result);
                 }
             } catch (error) {
-                console.error('Error loading featured stores:', error);
+                console.error('❌ Error loading featured stores:', error);
             }
         }
 
         // Load Latest Coupons
         async function loadLatestCoupons() {
             const container = document.getElementById('latestCouponsGrid');
-            if (!container) return;
+            if (!container) {
+                console.error('❌ latestCouponsGrid container not found');
+                return;
+            }
+            
+            console.log('🔄 Loading latest coupons...');
+            // Clear static content first
+            container.innerHTML = '';
             
             try {
                 const result = await CouponAPI.getAll();
+                console.log('📦 Latest coupons API result:', result);
+                
                 if (result.success && result.data && result.data.length > 0) {
                     const coupons = result.data.filter(c => c.is_active).slice(0, 6);
+                    console.log(`✅ Found ${coupons.length} active coupons for Latest Coupons section`);
+                    
                     if (coupons.length > 0) {
                         // Load stores to get store names
                         const storesResult = await StoreAPI.getAll();
@@ -1566,10 +1581,14 @@
                                 </div>
                             `;
                         }).join('');
+                    } else {
+                        console.log('⚠️ No active coupons found for Latest Coupons section');
                     }
+                } else {
+                    console.log('⚠️ No coupons data from API:', result);
                 }
             } catch (error) {
-                console.error('Error loading latest coupons:', error);
+                console.error('❌ Error loading latest coupons:', error);
             }
         }
 
