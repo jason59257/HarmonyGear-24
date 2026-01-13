@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/components.css">
     <script>
-        // Immediately hide static content containers on page load
+        // Immediately hide static content containers on page load and prevent image loading
         (function() {
             const style = document.createElement('style');
             style.textContent = `
@@ -20,8 +20,46 @@
                 #latestCouponsGrid > .coupon-card {
                     display: none !important;
                 }
+                /* Prevent images in hidden static content from loading */
+                #popularStoresRow > .store-card-popular img,
+                #extraCashBackStores > .store-card-compact img,
+                #dealsRow > .deal-card img,
+                #hotDealsGrid > .hot-deal-card img,
+                #priceDropsProducts > .product-card img,
+                #featuredStoresGrid > .store-card img,
+                #latestCouponsGrid > .coupon-card img {
+                    display: none !important;
+                    content: none !important;
+                }
             `;
             document.head.appendChild(style);
+            
+            // Also prevent image loading by removing src attributes immediately
+            document.addEventListener('DOMContentLoaded', function() {
+                const containers = [
+                    'popularStoresRow',
+                    'extraCashBackStores',
+                    'dealsRow',
+                    'hotDealsGrid',
+                    'priceDropsProducts',
+                    'featuredStoresGrid',
+                    'latestCouponsGrid'
+                ];
+                
+                containers.forEach(id => {
+                    const container = document.getElementById(id);
+                    if (container) {
+                        // Remove all img src attributes to prevent loading
+                        const images = container.querySelectorAll('img');
+                        images.forEach(img => {
+                            if (img.src && img.src.includes('via.placeholder.com')) {
+                                img.removeAttribute('src');
+                                img.removeAttribute('srcset');
+                            }
+                        });
+                    }
+                });
+            });
         })();
     </script>
 </head>
