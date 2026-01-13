@@ -359,7 +359,7 @@
             <div class="stores-section">
                 <h2 class="stores-section-title">Popular</h2>
                 <div class="stores-row-wrapper">
-                    <div class="stores-row">
+                    <div class="stores-row" id="popularStoresRow">
                         <div class="store-card-popular">
                             <div class="store-card-bg-popular" style="background-color: #E31E24;">
                                 <div class="store-logo-popular">macy's</div>
@@ -418,7 +418,7 @@
                     <h2 class="stores-section-title">Extra Cash Back stores</h2>
                     <a href="stores.html" class="see-all-link">See All</a>
                 </div>
-                <div class="stores-grid-large">
+                <div class="stores-grid-large" id="extraCashBackStores">
                     <div class="store-card-compact">
                         <div class="store-card-bg" style="background-color: #4CAF50;">
                             <div class="store-logo-compact">iHerb</div>
@@ -591,7 +591,7 @@
                     <a href="coupons.html" class="deals-see-all">See All</a>
                 </div>
                 <div class="deals-row-wrapper">
-                    <div class="deals-row">
+                    <div class="deals-row" id="dealsRow">
                         <div class="deal-card">
                             <div class="deal-logo-card" style="background-color: #E31E24;">
                                 <div class="deal-logo">♥CVS</div>
@@ -650,7 +650,7 @@
                 <h2 class="hot-deals-title">Hot deals and coupons</h2>
                 <a href="coupons.html" class="hot-deals-see-all">See All</a>
             </div>
-            <div class="hot-deals-grid">
+            <div class="hot-deals-grid" id="hotDealsGrid">
                 <div class="hot-deal-card">
                     <div class="hot-deal-logo-area">
                         <div class="hot-deal-logo">elf</div>
@@ -765,7 +765,7 @@
                 <a href="#" class="price-drops-see-all">See All</a>
             </div>
             <div class="price-drops-products-wrapper">
-                <div class="price-drops-products">
+                <div class="price-drops-products" id="priceDropsProducts">
                     <div class="product-card">
                         <div class="deal-badge best-price">Best Price</div>
                         <div class="product-image">
@@ -835,7 +835,7 @@
     <section class="featured-stores">
         <div class="container">
             <h2 class="section-title">Stores Our Members Love</h2>
-            <div class="stores-grid">
+            <div class="stores-grid" id="featuredStoresGrid">
                 <div class="store-card">
                     <div class="store-logo">
                         <img src="images/stores/target.png" alt="Target" onerror="this.src='https://via.placeholder.com/120x60?text=Target'">
@@ -931,7 +931,7 @@
     <section class="latest-coupons">
         <div class="container">
             <h2 class="section-title">Latest Coupons</h2>
-            <div class="coupons-grid">
+            <div class="coupons-grid" id="latestCouponsGrid">
                 <div class="coupon-card">
                     <div class="coupon-store">Target</div>
                     <div class="coupon-title">Save $10 on Orders Over $50</div>
@@ -1194,26 +1194,302 @@
     <script src="js/main.js"></script>
     <script src="js/auth-modal.js"></script>
     <script src="js/redirect.js"></script>
-    <script>
-        // Product redirect function
-        function redirectToProduct(redirectUrl) {
-            if (redirectUrl) {
-                window.open(redirectUrl, '_blank', 'noopener,noreferrer');
+    <script type="module">
+        import { StoreAPI, CouponAPI, ProductAPI } from './js/api.js';
+        import { redirectToStore, redirectToCoupon, redirectToProduct, copyCodeAndRedirect } from './js/redirect.js';
+
+        // Make functions globally available
+        window.redirectToStore = redirectToStore;
+        window.redirectToCoupon = redirectToCoupon;
+        window.redirectToProduct = redirectToProduct;
+        window.copyCodeAndRedirect = copyCodeAndRedirect;
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🔄 Loading homepage data...');
+            await Promise.all([
+                loadPopularStores(),
+                loadExtraCashBackStores(),
+                loadDealsOfTheWeek(),
+                loadHotDeals(),
+                loadTopPriceDrops(),
+                loadFeaturedStores(),
+                loadLatestCoupons()
+            ]);
+            console.log('✅ Homepage data loaded');
+        });
+
+        // Load Popular Stores
+        async function loadPopularStores() {
+            const container = document.getElementById('popularStoresRow');
+            if (!container) return;
+            
+            try {
+                const result = await StoreAPI.getAll();
+                if (result.success && result.data && result.data.length > 0) {
+                    const stores = result.data.filter(s => s.status === 'active').slice(0, 6);
+                    if (stores.length > 0) {
+                        container.innerHTML = stores.map(store => {
+                            const logoUrl = store.logo_url || '';
+                            const bgColor = getRandomColor();
+                            const cashback = store.cashback ? `${store.cashback}% Cash Back` : 'Cash Back Available';
+                            const cashbackWas = store.cashback_was ? `<span class="cashback-was-popular"> was ${store.cashback_was}%</span>` : '';
+                            
+                            return `
+                                <div class="store-card-popular" onclick="redirectToStore('${store.redirect_url || ''}', '${store.name}')">
+                                    <div class="store-card-bg-popular" style="background-color: ${bgColor};">
+                                        ${logoUrl ? `<img src="${logoUrl}" alt="${store.name}" class="store-logo-img-popular" style="width: 100%; height: 100%; object-fit: contain; padding: 10px;">` : `<div class="store-logo-popular">${store.name}</div>`}
+                                    </div>
+                                    <div class="store-cashback-info-popular">
+                                        <span class="cashback-current-popular">${cashback}</span>${cashbackWas}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading popular stores:', error);
             }
         }
-        
-        // 在实际应用中，这里会从API加载产品数据
-        // 示例：
-        // async function loadProducts() {
-        //     const response = await fetch('/api/products');
-        //     const products = await response.json();
-        //     products.forEach(product => {
-        //         const btn = document.querySelector(`[data-product-id="${product.id}"]`);
-        //         if (btn) {
-        //             btn.onclick = () => redirectToProduct(product.redirect_url);
-        //         }
-        //     });
-        // }
+
+        // Load Extra Cash Back Stores
+        async function loadExtraCashBackStores() {
+            const container = document.getElementById('extraCashBackStores');
+            if (!container) return;
+            
+            try {
+                const result = await StoreAPI.getAll();
+                if (result.success && result.data && result.data.length > 0) {
+                    const stores = result.data.filter(s => s.status === 'active' && s.cashback > 5).slice(0, 8);
+                    if (stores.length > 0) {
+                        container.innerHTML = stores.map(store => {
+                            const logoUrl = store.logo_url || '';
+                            const bgColor = getRandomColor();
+                            const cashback = store.cashback ? `${store.cashback}% Cash Back` : 'Cash Back Available';
+                            const cashbackWas = store.cashback_was ? `<span class="cashback-was"> was ${store.cashback_was}%</span>` : '';
+                            
+                            return `
+                                <div class="store-card-compact" onclick="redirectToStore('${store.redirect_url || ''}', '${store.name}')">
+                                    <div class="store-card-bg" style="background-color: ${bgColor};">
+                                        ${logoUrl ? `<img src="${logoUrl}" alt="${store.name}" class="store-logo-img-compact" style="width: 100%; height: 100%; object-fit: contain; padding: 10px;">` : `<div class="store-logo-compact">${store.name}</div>`}
+                                    </div>
+                                    <div class="store-cashback-info">
+                                        <span class="cashback-current">${cashback}</span>${cashbackWas}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading extra cashback stores:', error);
+            }
+        }
+
+        // Load Deals of the Week
+        async function loadDealsOfTheWeek() {
+            const container = document.getElementById('dealsRow');
+            if (!container) return;
+            
+            try {
+                const result = await CouponAPI.getAll();
+                if (result.success && result.data && result.data.length > 0) {
+                    const coupons = result.data.filter(c => c.is_active).slice(0, 4);
+                    if (coupons.length > 0) {
+                        // Load stores to get store names
+                        const storesResult = await StoreAPI.getAll();
+                        const storesMap = {};
+                        if (storesResult.success && storesResult.data) {
+                            storesResult.data.forEach(store => {
+                                storesMap[store.id] = store;
+                            });
+                        }
+                        
+                        container.innerHTML = coupons.map(coupon => {
+                            const store = storesMap[coupon.store_id] || { name: 'Store' };
+                            const bgColor = getRandomColor();
+                            const description = coupon.short_description || coupon.description || '';
+                            
+                            return `
+                                <div class="deal-card" onclick="copyCodeAndRedirect('${coupon.code || ''}', '${coupon.redirect_url || ''}')">
+                                    <div class="deal-logo-card" style="background-color: ${bgColor};">
+                                        <div class="deal-logo">${store.name.substring(0, 10)}</div>
+                                        <button class="deal-action-btn">Shop</button>
+                                    </div>
+                                    <div class="deal-info">
+                                        <div class="deal-cashback">${coupon.discount_value ? `${coupon.discount_value}% OFF` : 'Deal'}</div>
+                                        <div class="deal-description">${description.substring(0, 50)}${description.length > 50 ? '...' : ''}</div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading deals of the week:', error);
+            }
+        }
+
+        // Load Hot Deals
+        async function loadHotDeals() {
+            const container = document.getElementById('hotDealsGrid');
+            if (!container) return;
+            
+            try {
+                const result = await CouponAPI.getAll();
+                if (result.success && result.data && result.data.length > 0) {
+                    const coupons = result.data.filter(c => c.is_active && c.is_featured).slice(0, 4);
+                    if (coupons.length > 0) {
+                        // Load stores to get store names
+                        const storesResult = await StoreAPI.getAll();
+                        const storesMap = {};
+                        if (storesResult.success && storesResult.data) {
+                            storesResult.data.forEach(store => {
+                                storesMap[store.id] = store;
+                            });
+                        }
+                        
+                        container.innerHTML = coupons.map(coupon => {
+                            const store = storesMap[coupon.store_id] || { name: 'Store' };
+                            const title = coupon.title || coupon.short_description || '';
+                            
+                            return `
+                                <div class="hot-deal-card" onclick="copyCodeAndRedirect('${coupon.code || ''}', '${coupon.redirect_url || ''}')">
+                                    <div class="hot-deal-logo-area">
+                                        <div class="hot-deal-logo">${store.name.substring(0, 10)}</div>
+                                    </div>
+                                    <div class="hot-deal-content">
+                                        <div class="hot-deal-headline">${title.substring(0, 50)}${title.length > 50 ? '...' : ''}</div>
+                                        <div class="hot-deal-cashback">
+                                            <span class="hot-deal-current">${coupon.discount_value ? `${coupon.discount_value}% OFF` : 'Deal'}</span>
+                                        </div>
+                                        <button class="hot-deal-btn">Shop</button>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading hot deals:', error);
+            }
+        }
+
+        // Load Top Price Drops
+        async function loadTopPriceDrops() {
+            const container = document.getElementById('priceDropsProducts');
+            if (!container) return;
+            
+            try {
+                const result = await ProductAPI.getAll();
+                if (result.success && result.data && result.data.length > 0) {
+                    const products = result.data.filter(p => p.is_active).slice(0, 6);
+                    if (products.length > 0) {
+                        container.innerHTML = products.map(product => {
+                            const savings = product.savings_percent ? `Save ${product.savings_percent}%` : 'Deal';
+                            const savingsAmount = product.savings_amount ? `($${product.savings_amount.toFixed(2)})` : '';
+                            
+                            return `
+                                <div class="product-card" onclick="redirectToProduct('${product.redirect_url || ''}')">
+                                    <div class="deal-badge best-price">${savings}</div>
+                                    <div class="product-image">
+                                        <img src="${product.image_url || 'https://via.placeholder.com/200x200?text=Product'}" alt="${product.title}">
+                                    </div>
+                                    <div class="product-title">${product.title}</div>
+                                    <div class="product-price">$${product.price.toFixed(2)}</div>
+                                    ${product.savings_amount ? `<div class="product-savings">${savings} ${savingsAmount}</div>` : ''}
+                                    <button class="product-btn">View Product</button>
+                                </div>
+                            `;
+                        }).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading top price drops:', error);
+            }
+        }
+
+        // Load Featured Stores
+        async function loadFeaturedStores() {
+            const container = document.getElementById('featuredStoresGrid');
+            if (!container) return;
+            
+            try {
+                const result = await StoreAPI.getAll();
+                if (result.success && result.data && result.data.length > 0) {
+                    const stores = result.data.filter(s => s.status === 'active').slice(0, 6);
+                    if (stores.length > 0) {
+                        container.innerHTML = stores.map(store => {
+                            const cashback = store.cashback ? `${store.cashback}% Cash Back` : 'Cash Back Available';
+                            
+                            return `
+                                <div class="store-card">
+                                    <div class="store-logo">
+                                        <img src="${store.logo_url || 'https://via.placeholder.com/120x60?text=' + encodeURIComponent(store.name)}" alt="${store.name}" onerror="this.src='https://via.placeholder.com/120x60?text=' + encodeURIComponent('${store.name}')">
+                                    </div>
+                                    <div class="store-info">
+                                        <h3>${store.name}</h3>
+                                        <div class="cashback-badge boosted">${cashback}</div>
+                                        <a href="coupons.html?store=${store.id}" class="btn btn-outline">View Coupons</a>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading featured stores:', error);
+            }
+        }
+
+        // Load Latest Coupons
+        async function loadLatestCoupons() {
+            const container = document.getElementById('latestCouponsGrid');
+            if (!container) return;
+            
+            try {
+                const result = await CouponAPI.getAll();
+                if (result.success && result.data && result.data.length > 0) {
+                    const coupons = result.data.filter(c => c.is_active).slice(0, 6);
+                    if (coupons.length > 0) {
+                        // Load stores to get store names
+                        const storesResult = await StoreAPI.getAll();
+                        const storesMap = {};
+                        if (storesResult.success && storesResult.data) {
+                            storesResult.data.forEach(store => {
+                                storesMap[store.id] = store;
+                            });
+                        }
+                        
+                        container.innerHTML = coupons.map(coupon => {
+                            const store = storesMap[coupon.store_id] || { name: 'Store' };
+                            const title = coupon.title || 'Coupon';
+                            const code = coupon.code || '';
+                            
+                            return `
+                                <div class="coupon-card">
+                                    <div class="coupon-store">${store.name}</div>
+                                    <div class="coupon-title">${title}</div>
+                                    ${code ? `<div class="coupon-code">${code}</div>` : ''}
+                                    <div class="coupon-actions">
+                                        ${code && coupon.redirect_url ? `<button class="btn btn-primary btn-small" onclick="copyCodeAndRedirect('${code}', '${coupon.redirect_url}')">Copy Code</button>` : ''}
+                                        <a href="coupon-detail.html?id=${coupon.id}" class="btn btn-outline btn-small">Shop Now</a>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading latest coupons:', error);
+            }
+        }
+
+        // Helper function to get random color
+        function getRandomColor() {
+            const colors = ['#E31E24', '#FF6B35', '#2C2C2C', '#4CAF50', '#0066CC', '#003580', '#0D9488'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
     </script>
 </body>
 </html>
