@@ -103,13 +103,18 @@ function redirectToProduct(redirectUrl, productTitle) {
     window.open(redirectUrl, '_blank', 'noopener,noreferrer');
 }
 
-// ES6 module exports
-export { redirectToStore, redirectToCoupon, copyCodeAndRedirect, redirectToProduct };
-
-// Also export to global scope for non-module scripts
+// Export to global scope first (for non-module scripts)
 if (typeof window !== 'undefined') {
     window.redirectToStore = redirectToStore;
     window.redirectToCoupon = redirectToCoupon;
     window.copyCodeAndRedirect = copyCodeAndRedirect;
     window.redirectToProduct = redirectToProduct;
+}
+
+// ES6 module exports (for module scripts)
+// Only export if this file is loaded as a module
+try {
+    export { redirectToStore, redirectToCoupon, copyCodeAndRedirect, redirectToProduct };
+} catch (e) {
+    // Not a module context, functions already exported to window above
 }
