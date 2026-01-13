@@ -1,20 +1,18 @@
 // Configuration file for Cloudflare deployment
-// Update these values after deploying to Cloudflare
+// Production API configuration
 
 export const CONFIG = {
-    // Cloudflare Worker URL for image uploads
-    // Replace with your actual Worker URL after deployment
-    // Example: 'https://coupon-upload-handler.your-username.workers.dev'
-    UPLOAD_WORKER_URL: 'https://coupon-upload-handler.your-username.workers.dev',
+    // Main API Worker URL
+    API_BASE_URL: 'https://coupon-api.jason59257.workers.dev',
     
-    // Or use your custom domain
-    // UPLOAD_WORKER_URL: 'https://api.yourdomain.com/upload',
+    // Cloudflare Worker URL for image uploads
+    UPLOAD_WORKER_URL: 'https://coupon-upload-handler.jason59257.workers.dev',
     
     // R2 Public URL for displaying images
-    // Replace with your R2 public domain or custom domain
-    // Example: 'https://images.yourdomain.com'
-    R2_PUBLIC_URL: 'https://images.yourdomain.com',
+    // Update this after configuring R2 public access
+    R2_PUBLIC_URL: 'https://pub-xxxxx.r2.dev',
     
-    // Fallback to mock upload if Worker is not available (for local development)
+    // Use real API (not mock)
     USE_MOCK_UPLOAD: false,
+    USE_MOCK_API: false,
 };

@@ -88,8 +88,10 @@
         </div>
     </div>
 
-    <script>
-        // Simple, clean script without conflicts
+    <script type="module">
+        // Real admin login with API
+        import { AdminAuthAPI } from './js/api-real.js';
+        
         (function() {
             'use strict';
             
@@ -148,19 +150,47 @@
                 
                 // Form submission
                 if (loginForm) {
-                    loginForm.addEventListener('submit', function(e) {
+                    loginForm.addEventListener('submit', async function(e) {
                         e.preventDefault();
                         e.stopPropagation();
                         
-                        const email = emailInput ? emailInput.value : '';
+                        const email = emailInput ? emailInput.value.trim() : '';
                         const password = passwordInput ? passwordInput.value : '';
                         
-                        if (email && password) {
-                            localStorage.setItem('adminLoggedIn', 'true');
-                            localStorage.setItem('adminEmail', email);
-                            window.location.href = 'dashboard.html';
-                        } else {
+                        if (!email || !password) {
                             alert('Please enter email and password');
+                            return false;
+                        }
+                        
+                        // Disable form during login
+                        const submitBtn = loginForm.querySelector('button[type="submit"]');
+                        if (submitBtn) {
+                            submitBtn.disabled = true;
+                            submitBtn.textContent = 'Signing in...';
+                        }
+                        
+                        try {
+                            // Call real API
+                            const result = await AdminAuthAPI.login(email, password);
+                            
+                            if (result.success) {
+                                // Login successful
+                                window.location.href = 'dashboard.html';
+                            } else {
+                                // Login failed
+                                alert(result.error || 'Login failed. Please check your credentials.');
+                                if (submitBtn) {
+                                    submitBtn.disabled = false;
+                                    submitBtn.textContent = 'Sign In';
+                                }
+                            }
+                        } catch (error) {
+                            console.error('Login error:', error);
+                            alert('Login failed: ' + error.message);
+                            if (submitBtn) {
+                                submitBtn.disabled = false;
+                                submitBtn.textContent = 'Sign In';
+                            }
                         }
                         
                         return false;
