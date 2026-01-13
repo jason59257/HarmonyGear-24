@@ -1170,27 +1170,6 @@
     <script src="js/main.js"></script>
     <script src="js/auth-modal.js"></script>
     <script src="js/redirect.js"></script>
-    <script>
-        // Immediately clear all static content containers to prevent flash
-        (function() {
-            const containers = [
-                'popularStoresRow',
-                'extraCashBackStores',
-                'dealsRow',
-                'hotDealsGrid',
-                'priceDropsProducts',
-                'featuredStoresGrid',
-                'latestCouponsGrid'
-            ];
-            
-            containers.forEach(id => {
-                const container = document.getElementById(id);
-                if (container) {
-                    container.innerHTML = '';
-                }
-            });
-        })();
-    </script>
     <script type="module">
         import { StoreAPI, CouponAPI, ProductAPI } from './js/api.js';
         import { redirectToStore, redirectToCoupon, redirectToProduct, copyCodeAndRedirect } from './js/redirect.js';
@@ -1254,9 +1233,11 @@
                         }).join('');
                     } else {
                         console.log('⚠️ No active stores found for Popular section');
+                        container.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">暂无商店</div>';
                     }
                 } else {
                     console.log('⚠️ No stores data from API:', result);
+                    container.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">加载失败</div>';
                 }
             } catch (error) {
                 console.error('❌ Error loading popular stores:', error);
