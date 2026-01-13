@@ -317,5 +317,104 @@
             }
         });
     </script>
+    <script type="module">
+        import { CouponAPI, StoreAPI } from './js/api.js';
+        
+        // Load coupons from API
+        async function loadCoupons() {
+            try {
+                const result = await CouponAPI.getAll();
+                if (result.success && result.data && result.data.length > 0) {
+                    // Also load stores to get store names
+                    const storesResult = await StoreAPI.getAll();
+                    const stores = storesResult.success ? storesResult.data : [];
+                    const storesMap = {};
+                    stores.forEach(store => {
+                        storesMap[store.id] = store;
+                    });
+                    
+                    renderCoupons(result.data, storesMap);
+                } else {
+                    console.log('No coupons found or API error:', result.error);
+                    // Show empty state
+                    const grid = document.getElementById('couponsGrid');
+                    if (grid) {
+                        grid.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">暂无优惠券</div>';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading coupons:', error);
+                const grid = document.getElementById('couponsGrid');
+                if (grid) {
+                    grid.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">加载优惠券失败</div>';
+                }
+            }
+        }
+        
+        function renderCoupons(coupons, storesMap) {
+            const grid = document.getElementById('couponsGrid');
+            if (!grid) return;
+            
+            // Filter active coupons only
+            const activeCoupons = coupons.filter(coupon => coupon.is_active);
+            
+            if (activeCoupons.length === 0) {
+                grid.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">暂无可用优惠券</div>';
+                return;
+            }
+            
+            grid.innerHTML = activeCoupons.map(coupon => {
+                const store = storesMap[coupon.store_id] || { name: 'Unknown Store' };
+                const title = coupon.title || '优惠券';
+                const description = coupon.short_description || coupon.description || '';
+                const code = coupon.code || '';
+                const expiryDate = coupon.expiry_date ? new Date(coupon.expiry_date).toLocaleDateString('zh-CN') : '长期有效';
+                const usageCount = coupon.usage_count || 0;
+                const redirectUrl = coupon.redirect_url || '';
+                
+                // Determine badge
+                let badge = '';
+                if (coupon.is_featured) {
+                    badge = '<span class="badge badge-hot">热门</span>';
+                } else if (coupon.expiry_date) {
+                    const expiry = new Date(coupon.expiry_date);
+                    const daysUntilExpiry = Math.ceil((expiry - new Date()) / (1000 * 60 * 60 * 24));
+                    if (daysUntilExpiry <= 7 && daysUntilExpiry > 0) {
+                        badge = '<span class="badge badge-expiring">即将过期</span>';
+                    }
+                }
+                
+                const copyButton = code && redirectUrl 
+                    ? `<button class="btn btn-primary btn-small" onclick="copyCodeAndRedirect('${code}', '${redirectUrl}')">复制代码并去购物</button>`
+                    : code 
+                    ? `<button class="btn btn-primary btn-small" onclick="copyCode('${code}')">复制代码</button>`
+                    : '';
+                
+                return `
+                    <div class="coupon-card">
+                        <div class="coupon-header">
+                            <div class="coupon-store">${store.name}</div>
+                            ${badge}
+                        </div>
+                        <div class="coupon-title">${title}</div>
+                        ${description ? `<div class="coupon-description">${description}</div>` : ''}
+                        ${code ? `<div class="coupon-code">${code}</div>` : ''}
+                        <div class="coupon-meta">
+                            <span>有效期至: ${expiryDate}</span>
+                            <span>•</span>
+                            <span>已使用 ${usageCount.toLocaleString()} 次</span>
+                        </div>
+                        <div class="coupon-actions">
+                            ${copyButton}
+                            <a href="coupon-detail.html?id=${coupon.id}" class="btn btn-outline btn-small">查看详情</a>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Load coupons when page loads
+        document.addEventListener('DOMContentLoaded', loadCoupons);
+    </script>
 </body>
 </html>
