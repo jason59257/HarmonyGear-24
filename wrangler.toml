@@ -1,9 +1,16 @@
 # Cloudflare Worker configuration file
-# This file configures the Worker for handling image uploads
+# This file configures the Worker for handling image uploads and API
 
-name = "coupon-upload-handler"
-main = "workers/upload-handler.js"
+name = "coupon-api"
+main = "workers/api.js"
 compatibility_date = "2024-01-01"
+
+# D1 database binding
+# Replace 'database_id' with your actual D1 database ID from: wrangler d1 list
+[[d1_databases]]
+binding = "DB"
+database_name = "coupon-db"
+database_id = "YOUR_DATABASE_ID_HERE"  # ⬅️ 替换为你的 database_id
 
 # R2 bucket binding
 # Replace 'coupon-images' with your actual R2 bucket name
@@ -17,3 +24,4 @@ bucket_name = "coupon-images"
 # Or use your custom domain: https://images.yourdomain.com
 [vars]
 R2_PUBLIC_URL = "https://pub-xxxxx.r2.dev"  # Replace with your R2 public domain
+JWT_SECRET = "YOUR_JWT_SECRET_HERE"  # ⬅️ 替换为生成的 JWT_SECRET（稍后生成）
