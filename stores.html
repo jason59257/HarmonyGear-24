@@ -174,7 +174,18 @@
     <!-- Stores Grid -->
     <section class="all-stores-grid-section">
         <div class="container">
-            <div class="all-stores-grid" id="storesGrid">
+            <div class="all-stores-grid" id="storesGrid" style="min-height: 200px;">
+                <!-- Loading state -->
+                <div id="storesLoading" style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">
+                    <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #6B46C1; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                    <p style="margin-top: 20px;">加载中...</p>
+                </div>
+                <style>
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                </style>
                 <!-- Electronics -->
                 <a href="coupons.html?store=temu" class="all-store-card" data-category="electronics" onclick="event.preventDefault(); redirectToStore('https://temu.com/?ref=harmonygear24', 'TEMU');">
                     <div class="all-store-logo">
