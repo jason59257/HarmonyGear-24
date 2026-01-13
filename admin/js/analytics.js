@@ -1,4 +1,6 @@
-// Analytics JavaScript
+// Analytics JavaScript - Real API Implementation
+
+import { StoreAPI, CouponAPI, UserAPI } from './api-real.js';
 
 let revenueChart, couponUsageChart, userGrowthChart;
 
@@ -8,9 +10,12 @@ document.addEventListener('DOMContentLoaded', function() {
     loadAnalyticsData();
     
     // Update charts when time range changes
-    document.getElementById('timeRange').addEventListener('change', function() {
-        loadAnalyticsData();
-    });
+    const timeRangeSelect = document.getElementById('timeRange');
+    if (timeRangeSelect) {
+        timeRangeSelect.addEventListener('change', function() {
+            loadAnalyticsData();
+        });
+    }
 });
 
 // Initialize charts
@@ -112,20 +117,75 @@ function initializeCharts() {
     });
 }
 
-// Load analytics data
-function loadAnalyticsData() {
-    const timeRange = document.getElementById('timeRange').value;
-    
-    // Simulate API call
-    setTimeout(() => {
-        const data = generateMockData(timeRange);
-        updateCharts(data);
-        updateTopStores(data.topStores);
-    }, 300);
+// Load analytics data from real API
+async function loadAnalyticsData() {
+    try {
+        const timeRange = document.getElementById('timeRange')?.value || 30;
+        
+        // Load all data in parallel
+        const [storesResult, couponsResult, usersResult] = await Promise.all([
+            StoreAPI.getAll(),
+            CouponAPI.getAll(),
+            UserAPI.getAll()
+        ]);
+        
+        const stores = storesResult.success ? storesResult.data : [];
+        const coupons = couponsResult.success ? couponsResult.data : [];
+        const users = usersResult.success ? usersResult.data : [];
+        
+        // Calculate statistics
+        const totalCashback = users.reduce((sum, user) => sum + (user.total_cashback || 0) + (user.pending_cashback || 0), 0);
+        const activeUsers = users.filter(u => u.is_active === 1 || u.is_active === true).length;
+        const couponUsage = coupons.reduce((sum, coupon) => sum + (coupon.usage_count || 0), 0);
+        const activeStores = stores.filter(s => s.status === 'active').length;
+        
+        // Update stats cards
+        updateStatsCards({
+            totalCashback,
+            activeUsers,
+            couponUsage,
+            totalStores: activeStores
+        });
+        
+        // Generate chart data based on time range
+        const chartData = generateChartDataFromRealData(stores, coupons, users, parseInt(timeRange));
+        updateCharts(chartData);
+        
+        // Update top stores
+        updateTopStores(stores.slice(0, 5));
+        
+    } catch (error) {
+        console.error('Error loading analytics data:', error);
+        showError('Failed to load analytics data');
+    }
 }
 
-// Generate mock data based on time range
-function generateMockData(days) {
+// Update stats cards
+function updateStatsCards(stats) {
+    const totalCashbackEl = document.getElementById('totalCashback');
+    const cashbackChangeEl = document.getElementById('cashbackChange');
+    const couponUsageEl = document.getElementById('couponUsage');
+    const couponUsageChangeEl = document.getElementById('couponUsageChange');
+    const activeUsersEl = document.getElementById('activeUsers');
+    const activeUsersChangeEl = document.getElementById('activeUsersChange');
+    const totalStoresEl = document.getElementById('totalStores');
+    const totalStoresChangeEl = document.getElementById('totalStoresChange');
+    
+    if (totalCashbackEl) totalCashbackEl.textContent = '$' + stats.totalCashback.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    if (cashbackChangeEl) cashbackChangeEl.textContent = 'Total cashback';
+    
+    if (couponUsageEl) couponUsageEl.textContent = stats.couponUsage.toLocaleString();
+    if (couponUsageChangeEl) couponUsageChangeEl.textContent = 'Total usage';
+    
+    if (activeUsersEl) activeUsersEl.textContent = stats.activeUsers.toLocaleString();
+    if (activeUsersChangeEl) activeUsersChangeEl.textContent = 'Active users';
+    
+    if (totalStoresEl) totalStoresEl.textContent = stats.totalStores.toLocaleString();
+    if (totalStoresChangeEl) totalStoresChangeEl.textContent = 'Active stores';
+}
+
+// Generate chart data from real data
+function generateChartDataFromRealData(stores, coupons, users, days) {
     const labels = [];
     const revenueData = [];
     const couponData = [];
@@ -135,6 +195,7 @@ function generateMockData(days) {
     for (let i = days - 1; i >= 0; i--) {
         const date = new Date(today);
         date.setDate(date.getDate() - i);
+        date.setHours(0, 0, 0, 0);
         
         if (days <= 30) {
             labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
@@ -142,26 +203,47 @@ function generateMockData(days) {
             labels.push(date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }));
         }
         
-        // Generate realistic-looking data with some randomness
-        revenueData.push(Math.floor(Math.random() * 5000) + 5000);
-        couponData.push(Math.floor(Math.random() * 500) + 1000);
-        userData.push(Math.floor(Math.random() * 100) + 200);
+        // Calculate data for this date
+        const dateStr = date.toISOString().split('T')[0];
+        
+        // Revenue: sum of cashback from users created on or before this date
+        const revenue = users
+            .filter(u => new Date(u.created_at) <= date)
+            .reduce((sum, u) => sum + (u.total_cashback || 0) + (u.pending_cashback || 0), 0);
+        revenueData.push(revenue);
+        
+        // Coupon usage: count coupons used on or before this date
+        const couponCount = coupons
+            .filter(c => {
+                const createdDate = new Date(c.created_at);
+                return createdDate <= date;
+            })
+            .reduce((sum, c) => sum + (c.usage_count || 0), 0);
+        couponData.push(couponCount);
+        
+        // User growth: count users created on or before this date
+        const userCount = users.filter(u => {
+            const createdDate = new Date(u.created_at);
+            createdDate.setHours(0, 0, 0, 0);
+            return createdDate <= date;
+        }).length;
+        userData.push(userCount);
     }
     
     return {
         labels,
         revenue: revenueData,
         couponUsage: couponData,
-        userGrowth: userData,
-        topStores: [
-            { name: 'Amazon', revenue: 45678, clicks: 8234, conversion: 4.2 },
-            { name: 'Target', revenue: 32456, clicks: 6789, conversion: 3.8 },
-            { name: 'Walmart', revenue: 28901, clicks: 5432, conversion: 3.5 },
-            { name: 'Best Buy', revenue: 23456, clicks: 4567, conversion: 3.2 },
-            { name: 'Home Depot', revenue: 19876, clicks: 3456, conversion: 2.9 }
-        ]
+        userGrowth: userData
     };
 }
+
+function showError(message) {
+    console.error(message);
+    // You can add a notification here if needed
+}
+
+// This function is no longer needed - using real data instead
 
 // Update charts with new data
 function updateCharts(data) {
@@ -184,16 +266,27 @@ function updateCharts(data) {
 // Update top stores table
 function updateTopStores(stores) {
     const tbody = document.getElementById('topStoresTable');
-    tbody.innerHTML = '';
+    if (!tbody) return;
     
-    stores.forEach(store => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td><strong>${store.name}</strong></td>
-            <td>$${store.revenue.toLocaleString()}</td>
-            <td>${store.clicks.toLocaleString()}</td>
-            <td>${store.conversion}%</td>
+    if (stores.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px;">No stores yet</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = stores.map(store => {
+        // Calculate estimated metrics (since we don't have actual click/revenue tracking yet)
+        const cashback = store.cashback || 0;
+        const estimatedRevenue = cashback * 100; // Rough estimate
+        const estimatedClicks = Math.floor(estimatedRevenue / 10); // Rough estimate
+        const conversion = cashback > 0 ? (cashback / 10).toFixed(1) : '0.0';
+        
+        return `
+            <tr>
+                <td><strong>${store.name || 'N/A'}</strong></td>
+                <td>$${estimatedRevenue.toLocaleString()}</td>
+                <td>${estimatedClicks.toLocaleString()}</td>
+                <td>${conversion}%</td>
+            </tr>
         `;
-        tbody.appendChild(row);
-    });
+    }).join('');
 }

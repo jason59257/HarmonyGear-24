@@ -129,9 +129,9 @@
                         </svg>
                     </div>
                     <div class="admin-stat-content">
-                        <h3>Total Revenue</h3>
-                        <p class="admin-stat-number">$234,567</p>
-                        <span class="admin-stat-change positive">+18.2% from last period</span>
+                        <h3>Total Cashback</h3>
+                        <p class="admin-stat-number" id="totalCashback">$0</p>
+                        <span class="admin-stat-change" id="cashbackChange">Loading...</span>
                     </div>
                 </div>
 
@@ -143,9 +143,9 @@
                         </svg>
                     </div>
                     <div class="admin-stat-content">
-                        <h3>Coupon Clicks</h3>
-                        <p class="admin-stat-number">45,678</p>
-                        <span class="admin-stat-change positive">+12.5% from last period</span>
+                        <h3>Coupon Usage</h3>
+                        <p class="admin-stat-number" id="couponUsage">0</p>
+                        <span class="admin-stat-change" id="couponUsageChange">Total clicks</span>
                     </div>
                 </div>
 
@@ -158,8 +158,8 @@
                     </div>
                     <div class="admin-stat-content">
                         <h3>Active Users</h3>
-                        <p class="admin-stat-number">12,345</p>
-                        <span class="admin-stat-change positive">+8.7% from last period</span>
+                        <p class="admin-stat-number" id="activeUsers">0</p>
+                        <span class="admin-stat-change" id="activeUsersChange">Real-time data</span>
                     </div>
                 </div>
 
@@ -170,9 +170,9 @@
                         </svg>
                     </div>
                     <div class="admin-stat-content">
-                        <h3>Conversion Rate</h3>
-                        <p class="admin-stat-number">3.24%</p>
-                        <span class="admin-stat-change positive">+0.5% from last period</span>
+                        <h3>Total Stores</h3>
+                        <p class="admin-stat-number" id="totalStores">0</p>
+                        <span class="admin-stat-change" id="totalStoresChange">Active stores</span>
                     </div>
                 </div>
             </div>
@@ -216,22 +216,7 @@
                                 </thead>
                                 <tbody id="topStoresTable">
                                     <tr>
-                                        <td><strong>Amazon</strong></td>
-                                        <td>$45,678</td>
-                                        <td>8,234</td>
-                                        <td>4.2%</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Target</strong></td>
-                                        <td>$32,456</td>
-                                        <td>6,789</td>
-                                        <td>3.8%</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Walmart</strong></td>
-                                        <td>$28,901</td>
-                                        <td>5,432</td>
-                                        <td>3.5%</td>
+                                        <td colspan="4" style="text-align: center; padding: 20px;">Loading stores...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -252,7 +237,7 @@
     </main>
 
     <script src="js/admin.js"></script>
-    <script src="js/analytics.js"></script>
+    <script type="module" src="js/analytics.js"></script>
     <script>
         const adminEmail = localStorage.getItem('adminEmail');
         if (adminEmail) {
