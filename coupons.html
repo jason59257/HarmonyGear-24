@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>所有优惠券 - 优惠券网站</title>
+    <title>All Coupons - HarmonyGear 24</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/components.css">
 </head>
@@ -23,6 +23,13 @@
     <header class="header">
         <div class="container">
             <div class="header-content">
+                <!-- Mobile Menu Toggle -->
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Open menu">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 12H21M3 6H21M3 18H21" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                
                 <div class="logo">
                     <a href="index.html">
                         <h1>HarmonyGear 24</h1>
@@ -66,6 +73,7 @@
                             <a href="category.html?cat=sports">Sports, Outdoors & Fitness</a>
                             <a href="category.html?cat=subscription">Subscription Boxes & Services</a>
                             <a href="category.html?cat=toys">Toys & Games</a>
+                            <a href="category.html?cat=ecommerce">E-commerce</a>
                         </div>
                     </div>
                 </div>
@@ -83,40 +91,87 @@
                     </form>
                 </div>
 
-                <!-- Rewards Link -->
-                <a href="#" class="rewards-link">
+                <!-- Rewards Link (only visible when logged in) -->
+                <a href="#" class="rewards-link" id="rewardsLink" style="display: none;">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <rect x="3" y="8" width="18" height="13" rx="1" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 8V21" stroke="currentColor" stroke-width="2"/>
+                        <path d="M3 12H21" stroke="currentColor" stroke-width="2"/>
+                        <path d="M8 8C8 5.79086 9.79086 4 12 4C14.2091 4 16 5.79086 16 8" stroke="currentColor" stroke-width="2"/>
                     </svg>
                     <span>Rewards</span>
                 </a>
 
-                <!-- User Account / Login -->
-                <div class="user-account">
-                    <a href="login.html" class="user-link" id="userAccountLink">
+                <!-- Sign In / Join Now Buttons (hidden when logged in) -->
+                <div class="auth-buttons" id="authButtons">
+                    <button class="btn-signin" onclick="openAuthModal('login')">Sign In</button>
+                    <button class="btn-join" onclick="openAuthModal('register')">Join Now</button>
+                </div>
+                
+                <!-- User Account (visible when logged in) -->
+                <div class="user-account" id="userAccount" style="display: none;">
+                    <button class="user-account-btn" id="userAccountBtn">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/>
+                            <path d="M6 21C6 17 9 14 12 14C15 14 18 17 18 21" stroke="currentColor" stroke-width="2"/>
                         </svg>
-                        <span class="user-name">Sign In</span>
-                        <span class="user-balance">$0.00</span>
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </a>
-                    <div class="user-dropdown-menu">
-                        <a href="login.html">Sign In</a>
-                        <a href="register.html">Join Free</a>
-                        <a href="#">My Account</a>
-                        <a href="#">Cash Back History</a>
-                        <a href="#">Settings</a>
+                        <span id="userEmail">User</span>
+                    </button>
+                    <div class="user-dropdown" id="userDropdown">
+                        <a href="#" onclick="logout(); return false;">Logout</a>
                     </div>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- 页面标题和搜索 -->
+    <!-- Mobile Side Menu -->
+    <div class="mobile-side-menu" id="mobileSideMenu">
+        <div class="mobile-menu-header">
+            <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 6L6 18M6 6L18 18" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="mobile-menu-promo">
+            <p>Join HarmonyGear 24 Today and Get a $10 Cash Bonus*</p>
+        </div>
+        
+        <!-- Mobile Auth Buttons (shown when not logged in) -->
+        <div class="mobile-menu-auth" id="mobileMenuAuth">
+            <button class="mobile-btn-signin" onclick="openAuthModal('login'); closeMobileMenu();">Sign In</button>
+            <button class="mobile-btn-join" onclick="openAuthModal('register'); closeMobileMenu();">Join Now</button>
+        </div>
+        
+        <!-- Mobile User Account (shown when logged in) -->
+        <div class="mobile-menu-user" id="mobileMenuUser" style="display: none;">
+            <div class="mobile-user-info">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/>
+                    <path d="M6 21C6 17 9 14 12 14C15 14 18 17 18 21" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <div>
+                    <div id="mobileUserEmail">User</div>
+                    <div class="mobile-user-balance">$0.00</div>
+                </div>
+            </div>
+            <a href="#" onclick="logout(); return false;">Logout</a>
+        </div>
+        
+        <nav class="mobile-menu-nav">
+            <a href="index.html">Home</a>
+            <a href="stores.html">All Stores</a>
+            <a href="coupons.html">All Coupons</a>
+            <a href="category.html">Categories</a>
+        </nav>
+    </div>
+    
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+
+    <!-- Page Header -->
     <section class="page-header">
         <div class="container">
             <h1 class="page-title">All Coupons</h1>
@@ -124,34 +179,34 @@
         </div>
     </section>
 
-    <!-- 筛选和排序 -->
+    <!-- Filters and Sort -->
     <section class="filters-section">
         <div class="container">
             <div class="filters">
-                <div class="filter-item active" data-filter="all">全部</div>
-                <div class="filter-item" data-filter="new">最新</div>
-                <div class="filter-item" data-filter="hot">热门</div>
-                <div class="filter-item" data-filter="expiring">即将过期</div>
+                <div class="filter-item active" data-filter="all">All</div>
+                <div class="filter-item" data-filter="new">New</div>
+                <div class="filter-item" data-filter="hot">Popular</div>
+                <div class="filter-item" data-filter="expiring">Expiring Soon</div>
             </div>
             <div class="sort-selector">
-                <label>排序:</label>
+                <label>Sort by:</label>
                 <select id="sortSelect">
-                    <option value="newest">最新发布</option>
-                    <option value="popular">最受欢迎</option>
-                    <option value="expiring">即将过期</option>
+                    <option value="newest">Latest Release</option>
+                    <option value="popular">Most Popular</option>
+                    <option value="expiring">Expiring Soon</option>
                 </select>
             </div>
         </div>
     </section>
 
-    <!-- 优惠券列表 -->
+    <!-- Coupons List -->
     <section class="coupons-list">
         <div class="container">
             <div class="coupons-grid" id="couponsGrid" style="min-height: 200px;">
                 <!-- Loading state -->
                 <div id="couponsLoading" style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">
                     <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #6B46C1; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-                    <p style="margin-top: 20px;">加载中...</p>
+                    <p style="margin-top: 20px;">Loading...</p>
                 </div>
                 <style>
                     @keyframes spin {
@@ -162,65 +217,66 @@
                 <!-- Coupons will be loaded dynamically from API -->
             </div>
 
-            <!-- 分页 -->
+            <!-- Pagination -->
             <div class="pagination">
                 <a href="#" class="active">1</a>
                 <a href="#">2</a>
                 <a href="#">3</a>
                 <a href="#">4</a>
                 <a href="#">5</a>
-                <a href="#">下一页 →</a>
+                <a href="#">Next →</a>
             </div>
         </div>
     </section>
 
-    <!-- 页脚 -->
+    <!-- Footer -->
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h4>关于我们</h4>
+                    <h4>About Us</h4>
                     <ul>
-                        <li><a href="#">关于 HarmonyGear 24</a></li>
-                        <li><a href="#">如何开始</a></li>
-                        <li><a href="#">广告与合作伙伴</a></li>
-                        <li><a href="#">新闻中心</a></li>
-                        <li><a href="#">职业机会</a></li>
+                        <li><a href="#">About HarmonyGear 24</a></li>
+                        <li><a href="#">How to Get Started</a></li>
+                        <li><a href="#">Advertising & Partners</a></li>
+                        <li><a href="#">News Center</a></li>
+                        <li><a href="#">Careers</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
-                    <h4>商店与品牌</h4>
+                    <h4>Stores & Brands</h4>
                     <ul>
-                        <li><a href="stores.html">所有商店</a></li>
-                        <li><a href="category.html">按分类浏览</a></li>
-                        <li><a href="coupons.html">所有优惠券</a></li>
+                        <li><a href="stores.html">All Stores</a></li>
+                        <li><a href="category.html">Browse by Category</a></li>
+                        <li><a href="coupons.html">All Coupons</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
-                    <h4>工具与服务</h4>
+                    <h4>Tools & Services</h4>
                     <ul>
-                        <li><a href="#">浏览器扩展</a></li>
-                        <li><a href="#">移动应用</a></li>
-                        <li><a href="#">店内现金返还</a></li>
+                        <li><a href="#">Browser Extension</a></li>
+                        <li><a href="#">Mobile App</a></li>
+                        <li><a href="#">In-Store Cash Back</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
-                    <h4>帮助</h4>
+                    <h4>Help</h4>
                     <ul>
-                        <li><a href="#">常见问题</a></li>
-                        <li><a href="#">联系我们</a></li>
-                        <li><a href="#">服务条款</a></li>
-                        <li><a href="#">隐私政策</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
                     </ul>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 HarmonyGear 24. 保留所有权利。</p>
+                <p>&copy; 2024 HarmonyGear 24. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
     <script src="js/main.js"></script>
+    <script src="js/auth-modal.js"></script>
     <!-- redirect.js functions are available via window object from main.js or module imports -->
     <script>
         // Immediately clear static content and show loading
@@ -231,7 +287,7 @@
                 const loadingHtml = `
                     <div id="couponsLoading" style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">
                         <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #6B46C1; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-                        <p style="margin-top: 20px;">加载中...</p>
+                        <p style="margin-top: 20px;">Loading...</p>
                     </div>
                     <style>
                         @keyframes spin {
@@ -246,143 +302,94 @@
     </script>
     <script type="module">
         import { CouponAPI, StoreAPI } from './js/api.js';
+        import { copyCodeAndRedirect } from './js/redirect.js';
+        
+        // Make functions globally available
+        window.copyCodeAndRedirect = copyCodeAndRedirect;
+        
+        let allCoupons = [];
+        let allStores = [];
+        let storesMap = {};
         
         // Load coupons from API
         async function loadCoupons() {
             const grid = document.getElementById('couponsGrid');
             
             try {
-                console.log('Loading coupons from API...');
-                const result = await CouponAPI.getAll();
-                console.log('CouponAPI.getAll result:', result);
+                // Show loading state
+                if (window.UIUtils) {
+                    window.UIUtils.showLoading('couponsGrid', 'Loading coupons...');
+                }
                 
-                if (result.success && result.data && result.data.length > 0) {
-                    // Also load stores to get store names
-                    const storesResult = await StoreAPI.getAll();
-                    const stores = storesResult.success ? storesResult.data : [];
-                    const storesMap = {};
-                    stores.forEach(store => {
+                console.log('Loading coupons from API...');
+                const [couponsResult, storesResult] = await Promise.all([
+                    CouponAPI.getAll(),
+                    StoreAPI.getAll()
+                ]);
+                
+                console.log('CouponAPI.getAll result:', couponsResult);
+                
+                if (couponsResult.success && couponsResult.data) {
+                    allCoupons = couponsResult.data;
+                }
+                
+                if (storesResult.success && storesResult.data) {
+                    allStores = storesResult.data;
+                    storesMap = {};
+                    allStores.forEach(store => {
                         storesMap[store.id] = store;
                     });
+                }
+                
+                // Check for URL parameters
+                const urlParams = new URLSearchParams(window.location.search);
+                const searchQuery = urlParams.get('search');
+                const storeId = urlParams.get('store');
+                
+                // Apply filters
+                let filteredCoupons = allCoupons.filter(coupon => coupon.is_active || coupon.status === 'active');
+                
+                if (storeId) {
+                    filteredCoupons = filteredCoupons.filter(coupon => coupon.store_id == storeId);
+                }
+                
+                if (searchQuery) {
+                    const query = searchQuery.toLowerCase();
+                    filteredCoupons = filteredCoupons.filter(coupon => 
+                        coupon.title?.toLowerCase().includes(query) ||
+                        coupon.description?.toLowerCase().includes(query) ||
+                        coupon.short_description?.toLowerCase().includes(query) ||
+                        coupon.code?.toLowerCase().includes(query) ||
+                        storesMap[coupon.store_id]?.name?.toLowerCase().includes(query)
+                    );
                     
-                    renderCoupons(result.data, storesMap);
+                    // Update search input
+                    const searchInput = document.getElementById('couponSearch');
+                    if (searchInput) {
+                        searchInput.value = searchQuery;
+                    }
+                }
+                
+                if (filteredCoupons.length > 0) {
+                    renderCoupons(filteredCoupons, storesMap);
                 } else {
-                    console.log('No coupons found or API error:', result.error);
-                    // Show empty state
-                    if (grid) {
-                        grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">暂无优惠券</div>';
+                    if (window.UIUtils) {
+                        window.UIUtils.showEmpty('couponsGrid', searchQuery ? 'No coupons found matching your search.' : 'No coupons available.');
+                    } else {
+                        grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">No coupons found</div>';
                     }
                 }
             } catch (error) {
                 console.error('Error loading coupons:', error);
-                if (grid) {
-                    grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">加载优惠券失败，请刷新页面重试</div>';
-                }
-            }
-        }
-        
-        function renderCoupons(coupons, storesMap) {
-            const grid = document.getElementById('couponsGrid');
-            if (!grid) return;
-            
-            // Filter active coupons only
-            const activeCoupons = coupons.filter(coupon => coupon.is_active);
-            
-            if (activeCoupons.length === 0) {
-                grid.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">暂无可用优惠券</div>';
-                return;
-            }
-            
-            grid.innerHTML = activeCoupons.map(coupon => {
-                const store = storesMap[coupon.store_id] || { name: 'Unknown Store' };
-                const title = coupon.title || '优惠券';
-                const description = coupon.short_description || coupon.description || '';
-                const code = coupon.code || '';
-                const expiryDate = coupon.expiry_date ? new Date(coupon.expiry_date).toLocaleDateString('zh-CN') : '长期有效';
-                const usageCount = coupon.usage_count || 0;
-                
-                // Determine badge
-                let badge = '';
-                if (coupon.is_featured) {
-                    badge = '<span class="badge badge-hot">热门</span>';
-                } else if (coupon.expiry_date) {
-                    const expiry = new Date(coupon.expiry_date);
-                    const daysUntilExpiry = Math.ceil((expiry - new Date()) / (1000 * 60 * 60 * 24));
-                    if (daysUntilExpiry <= 7) {
-                        badge = '<span class="badge badge-expiring">即将过期</span>';
-                    }
-                }
-                
-                return `
-                    <div class="coupon-card">
-                        <div class="coupon-header">
-                            <div class="coupon-store">${store.name}</div>
-                            ${badge}
-                        </div>
-                        <div class="coupon-title">${title}</div>
-                        ${description ? `<div class="coupon-description">${description}</div>` : ''}
-                        ${code ? `<div class="coupon-code">${code}</div>` : ''}
-                        <div class="coupon-meta">
-                            <span>有效期至: ${expiryDate}</span>
-                            <span>•</span>
-                            <span>已使用 ${usageCount.toLocaleString()} 次</span>
-                        </div>
-                        <div class="coupon-actions">
-                            ${code ? `<button class="btn btn-primary btn-small" onclick="copyCode('${code}')">复制代码</button>` : ''}
-                            <a href="coupon-detail.html?id=${coupon.id}" class="btn btn-outline btn-small">查看详情</a>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-        
-        // Load coupons when page loads
-        document.addEventListener('DOMContentLoaded', loadCoupons);
-    </script>
-    <script>
-        function performSearch() {
-            const query = document.getElementById('couponSearch').value;
-            if (query.trim()) {
-                console.log('搜索:', query);
-            }
-        }
-
-        document.getElementById('couponSearch').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                performSearch();
-            }
-        });
-    </script>
-    <script type="module">
-        import { CouponAPI, StoreAPI } from './js/api.js';
-        
-        // Load coupons from API
-        async function loadCoupons() {
-            try {
-                const result = await CouponAPI.getAll();
-                if (result.success && result.data && result.data.length > 0) {
-                    // Also load stores to get store names
-                    const storesResult = await StoreAPI.getAll();
-                    const stores = storesResult.success ? storesResult.data : [];
-                    const storesMap = {};
-                    stores.forEach(store => {
-                        storesMap[store.id] = store;
+                if (window.UIUtils) {
+                    window.UIUtils.showError('couponsGrid', 'Failed to load coupons. Please refresh the page.', true, () => {
+                        loadCoupons();
                     });
-                    
-                    renderCoupons(result.data, storesMap);
                 } else {
-                    console.log('No coupons found or API error:', result.error);
-                    // Show empty state
                     const grid = document.getElementById('couponsGrid');
                     if (grid) {
-                        grid.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">暂无优惠券</div>';
+                        grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">Failed to load coupons. Please refresh the page.</div>';
                     }
-                }
-            } catch (error) {
-                console.error('Error loading coupons:', error);
-                const grid = document.getElementById('couponsGrid');
-                if (grid) {
-                    grid.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">加载优惠券失败</div>';
                 }
             }
         }
@@ -391,39 +398,33 @@
             const grid = document.getElementById('couponsGrid');
             if (!grid) return;
             
-            // Filter active coupons only
-            const activeCoupons = coupons.filter(coupon => coupon.is_active);
-            
-            if (activeCoupons.length === 0) {
-                grid.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">暂无可用优惠券</div>';
-                return;
-            }
-            
-            grid.innerHTML = activeCoupons.map(coupon => {
+            grid.innerHTML = coupons.map(coupon => {
                 const store = storesMap[coupon.store_id] || { name: 'Unknown Store' };
-                const title = coupon.title || '优惠券';
+                const title = coupon.title || 'Coupon';
                 const description = coupon.short_description || coupon.description || '';
                 const code = coupon.code || '';
-                const expiryDate = coupon.expiry_date ? new Date(coupon.expiry_date).toLocaleDateString('zh-CN') : '长期有效';
+                const expiryDate = coupon.expiry_date ? new Date(coupon.expiry_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'No expiry';
                 const usageCount = coupon.usage_count || 0;
                 const redirectUrl = coupon.redirect_url || '';
                 
                 // Determine badge
                 let badge = '';
                 if (coupon.is_featured) {
-                    badge = '<span class="badge badge-hot">热门</span>';
+                    badge = '<span class="badge badge-hot">Hot</span>';
+                } else if (coupon.is_new) {
+                    badge = '<span class="badge badge-new">New</span>';
                 } else if (coupon.expiry_date) {
                     const expiry = new Date(coupon.expiry_date);
                     const daysUntilExpiry = Math.ceil((expiry - new Date()) / (1000 * 60 * 60 * 24));
                     if (daysUntilExpiry <= 7 && daysUntilExpiry > 0) {
-                        badge = '<span class="badge badge-expiring">即将过期</span>';
+                        badge = '<span class="badge badge-expiring">Expiring Soon</span>';
                     }
                 }
                 
                 const copyButton = code && redirectUrl 
-                    ? `<button class="btn btn-primary btn-small" onclick="copyCodeAndRedirect('${code}', '${redirectUrl}')">复制代码并去购物</button>`
+                    ? `<button class="btn btn-primary btn-small" onclick="copyCodeAndRedirect('${code}', '${redirectUrl}')">Copy Code & Shop</button>`
                     : code 
-                    ? `<button class="btn btn-primary btn-small" onclick="copyCode('${code}')">复制代码</button>`
+                    ? `<button class="btn btn-primary btn-small" onclick="copyCode('${code}')">Copy Code</button>`
                     : '';
                 
                 return `
@@ -436,21 +437,85 @@
                         ${description ? `<div class="coupon-description">${description}</div>` : ''}
                         ${code ? `<div class="coupon-code">${code}</div>` : ''}
                         <div class="coupon-meta">
-                            <span>有效期至: ${expiryDate}</span>
+                            <span>Expires: ${expiryDate}</span>
                             <span>•</span>
-                            <span>已使用 ${usageCount.toLocaleString()} 次</span>
+                            <span>Used ${usageCount.toLocaleString()} times</span>
                         </div>
                         <div class="coupon-actions">
                             ${copyButton}
-                            <a href="coupon-detail.html?id=${coupon.id}" class="btn btn-outline btn-small">查看详情</a>
+                            <a href="coupon-detail.html?id=${coupon.id}" class="btn btn-outline btn-small">View Details</a>
                         </div>
                     </div>
                 `;
             }).join('');
         }
         
-        // Load coupons when page loads
-        document.addEventListener('DOMContentLoaded', loadCoupons);
+        // Search function
+        function performSearch() {
+            const query = document.getElementById('couponSearch')?.value || '';
+            if (query.trim()) {
+                window.location.href = `coupons.html?search=${encodeURIComponent(query.trim())}`;
+            } else {
+                window.location.href = 'coupons.html';
+            }
+        }
+        
+        // Make search function globally available
+        window.performSearch = performSearch;
+        
+        // Mobile menu functions
+        function closeMobileMenu() {
+            const mobileSideMenu = document.getElementById('mobileSideMenu');
+            const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+            if (mobileSideMenu) {
+                mobileSideMenu.classList.remove('active');
+            }
+            if (mobileMenuOverlay) {
+                mobileMenuOverlay.classList.remove('active');
+            }
+            document.body.style.overflow = '';
+        }
+        
+        window.closeMobileMenu = closeMobileMenu;
+        
+        // Initialize search input and mobile menu
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('couponSearch');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        performSearch();
+                    }
+                });
+            }
+            
+            // Mobile menu toggle
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const mobileMenuClose = document.getElementById('mobileMenuClose');
+            const mobileSideMenu = document.getElementById('mobileSideMenu');
+            const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+            
+            if (mobileMenuToggle && mobileSideMenu) {
+                mobileMenuToggle.addEventListener('click', function() {
+                    mobileSideMenu.classList.add('active');
+                    if (mobileMenuOverlay) {
+                        mobileMenuOverlay.classList.add('active');
+                    }
+                    document.body.style.overflow = 'hidden';
+                });
+            }
+            
+            if (mobileMenuClose) {
+                mobileMenuClose.addEventListener('click', closeMobileMenu);
+            }
+            
+            if (mobileMenuOverlay) {
+                mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+            }
+            
+            // Load coupons
+            loadCoupons();
+        });
     </script>
 </body>
 </html>

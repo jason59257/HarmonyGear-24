@@ -83,6 +83,94 @@ export const ProductAPI = {
             console.error('ProductAPI.getAll error:', error);
             return { success: false, error: error.message, data: [] };
         }
+    },
+
+    async getById(id) {
+        try {
+            const result = await apiRequest(`/api/products/${id}`);
+            return result;
+        } catch (error) {
+            console.error('ProductAPI.getById error:', error);
+            return { success: false, error: error.message };
+        }
+    }
+};
+
+// Category API
+export const CategoryAPI = {
+    async getAll() {
+        try {
+            const result = await apiRequest('/api/categories');
+            return { success: true, data: result.data || [] };
+        } catch (error) {
+            console.error('CategoryAPI.getAll error:', error);
+            return { success: false, error: error.message, data: [] };
+        }
+    },
+
+    async getById(id) {
+        try {
+            const result = await apiRequest(`/api/categories/${id}`);
+            return result;
+        } catch (error) {
+            console.error('CategoryAPI.getById error:', error);
+            return { success: false, error: error.message };
+        }
+    }
+};
+
+// Search API
+export const SearchAPI = {
+    async search(query, type = 'all') {
+        try {
+            // Search across stores, coupons, and products
+            const [storesResult, couponsResult, productsResult] = await Promise.all([
+                StoreAPI.getAll(),
+                CouponAPI.getAll(),
+                ProductAPI.getAll()
+            ]);
+
+            const results = {
+                stores: [],
+                coupons: [],
+                products: []
+            };
+
+            const lowerQuery = query.toLowerCase();
+
+            if (type === 'all' || type === 'stores') {
+                if (storesResult.success && storesResult.data) {
+                    results.stores = storesResult.data.filter(store => 
+                        store.name?.toLowerCase().includes(lowerQuery) ||
+                        store.description?.toLowerCase().includes(lowerQuery)
+                    );
+                }
+            }
+
+            if (type === 'all' || type === 'coupons') {
+                if (couponsResult.success && couponsResult.data) {
+                    results.coupons = couponsResult.data.filter(coupon => 
+                        coupon.title?.toLowerCase().includes(lowerQuery) ||
+                        coupon.description?.toLowerCase().includes(lowerQuery) ||
+                        coupon.code?.toLowerCase().includes(lowerQuery)
+                    );
+                }
+            }
+
+            if (type === 'all' || type === 'products') {
+                if (productsResult.success && productsResult.data) {
+                    results.products = productsResult.data.filter(product => 
+                        product.name?.toLowerCase().includes(lowerQuery) ||
+                        product.description?.toLowerCase().includes(lowerQuery)
+                    );
+                }
+            }
+
+            return { success: true, data: results };
+        } catch (error) {
+            console.error('SearchAPI.search error:', error);
+            return { success: false, error: error.message, data: { stores: [], coupons: [], products: [] } };
+        }
     }
 };
 
@@ -91,4 +179,6 @@ if (typeof window !== 'undefined') {
     window.StoreAPI = StoreAPI;
     window.CouponAPI = CouponAPI;
     window.ProductAPI = ProductAPI;
+    window.CategoryAPI = CategoryAPI;
+    window.SearchAPI = SearchAPI;
 }

@@ -8,7 +8,18 @@
     <link rel="stylesheet" href="css/components.css">
 </head>
 <body>
-    <!-- 顶部导航栏 -->
+    <!-- Top Links Bar -->
+    <div class="top-links-bar">
+        <div class="container">
+            <div class="top-links">
+                <a href="#">HarmonyGear 24 Card</a>
+                <a href="#">HarmonyGear 24 Dining</a>
+                <a href="#">How We Make Money</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navigation Bar -->
     <header class="header">
         <div class="container">
             <div class="header-content">
@@ -17,118 +28,180 @@
                         <h1>HarmonyGear 24</h1>
                     </a>
                 </div>
-                <nav class="main-nav">
-                    <ul>
-                        <li><a href="index.html">首页</a></li>
-                        <li><a href="stores.html">商店</a></li>
-                        <li><a href="coupons.html">优惠券</a></li>
-                        <li><a href="category.html">分类</a></li>
-                    </ul>
-                </nav>
-                <div class="header-actions">
-                    <a href="login.html" class="btn-login">登录</a>
-                    <a href="register.html" class="btn-register">免费注册</a>
+                
+                <!-- Categories Dropdown -->
+                <div class="categories-dropdown">
+                    <button class="categories-btn">
+                        <span>Categories</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div class="categories-dropdown-menu">
+                        <div class="categories-intro-links">
+                            <a href="stores.html" class="intro-link">
+                                <span>See All Stores</span>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </a>
+                        </div>
+                        <div class="categories-list">
+                            <a href="category.html?cat=travel">Travel & Vacations</a>
+                            <a href="category.html?cat=clothing">Clothing</a>
+                            <a href="category.html?cat=beauty">Beauty & Wellness</a>
+                            <a href="category.html?cat=accessories">Accessories</a>
+                            <a href="category.html?cat=auto">Auto & Tires</a>
+                            <a href="category.html?cat=baby">Baby & Toddler</a>
+                            <a href="category.html?cat=banking">Banking & Finance Tools</a>
+                            <a href="category.html?cat=business">Business Supplies & Services</a>
+                            <a href="category.html?cat=digital">Digital Services & Streaming</a>
+                            <a href="category.html?cat=electronics">Electronics</a>
+                            <a href="category.html?cat=events">Events & Entertainment</a>
+                            <a href="category.html?cat=food">Food, Drinks & Restaurants</a>
+                            <a href="category.html?cat=gifts">Gifts, Flowers & Parties</a>
+                            <a href="category.html?cat=home">Home & Garden</a>
+                            <a href="category.html?cat=pets">Pets</a>
+                            <a href="category.html?cat=shoes">Shoes</a>
+                            <a href="category.html?cat=sports">Sports, Outdoors & Fitness</a>
+                            <a href="category.html?cat=subscription">Subscription Boxes & Services</a>
+                            <a href="category.html?cat=toys">Toys & Games</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="header-search">
+                    <form class="search-form" onsubmit="event.preventDefault(); performSearch();">
+                        <input type="text" placeholder="Search stores, products, and coupons" id="headerSearch">
+                        <button type="submit" class="search-btn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
+                                <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Rewards Link -->
+                <a href="#" class="rewards-link">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Rewards</span>
+                </a>
+
+                <!-- User Account / Login -->
+                <div class="user-account">
+                    <a href="login.html" class="user-link" id="userAccountLink">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        <span>Sign In</span>
+                    </a>
                 </div>
             </div>
         </div>
     </header>
 
+    <!-- Loading State -->
+    <div id="loadingState" class="loading-container" style="display: none;">
+        <div class="loading-spinner"></div>
+        <p>Loading coupon details...</p>
+    </div>
+
+    <!-- Error State -->
+    <div id="errorState" class="error-container" style="display: none;">
+        <div class="error-message">
+            <h2>Unable to Load Coupon</h2>
+            <p id="errorText">An error occurred while loading the coupon details.</p>
+            <a href="coupons.html" class="btn btn-primary">Back to Coupons</a>
+        </div>
+    </div>
+
     <!-- 优惠券详情 -->
-    <section class="coupon-detail">
+    <section class="coupon-detail" id="couponDetailSection">
         <div class="container">
             <div class="detail-content">
                 <div class="detail-main">
-                    <div class="store-header">
+                    <div class="store-header" id="storeHeader">
                         <div class="store-logo-large">
-                            <img src="images/stores/target.png" alt="Target" onerror="this.src='https://via.placeholder.com/150x75?text=Target'">
+                            <div id="storeLogo" class="store-logo-placeholder"></div>
                         </div>
                         <div class="store-header-info">
-                            <h1>Target</h1>
+                            <h1 id="storeName">Loading...</h1>
                             <div class="cashback-info">
-                                <span class="cashback-badge boosted">11% 现金返还</span>
+                                <span class="cashback-badge boosted" id="cashbackBadge">Cash Back</span>
                             </div>
                         </div>
                     </div>
 
                     <div class="coupon-detail-card">
                         <div class="coupon-detail-header">
-                            <h2>满$50减$10</h2>
-                            <span class="badge badge-new">新</span>
+                            <h2 id="couponTitle">Loading...</h2>
+                            <span class="badge badge-new" id="couponBadge" style="display: none;">New</span>
                         </div>
-                        <div class="coupon-code-large">
-                            <span id="couponCode">SAVE10</span>
-                            <button class="btn btn-primary" onclick="copyCode('SAVE10')">复制代码</button>
+                        <div class="coupon-code-large" id="couponCodeSection" style="display: none;">
+                            <span id="couponCode">-</span>
+                            <button class="btn btn-primary" id="copyCodeBtn">Copy Code</button>
                         </div>
                         <div class="coupon-description-full">
-                            <h3>优惠详情</h3>
-                            <p>在Target购物满$50即可享受$10折扣。此优惠适用于所有商品，包括服装、家居用品、电子产品等。优惠码在结账时使用。</p>
-                            <ul>
-                                <li>最低消费: $50</li>
-                                <li>折扣金额: $10</li>
-                                <li>有效期: 2024年12月31日</li>
-                                <li>适用范围: 所有商品</li>
-                            </ul>
+                            <h3>Details</h3>
+                            <p id="couponDescription">Loading...</p>
+                            <ul id="couponDetailsList"></ul>
                         </div>
                         <div class="coupon-usage">
-                            <h3>使用方法</h3>
+                            <h3>How to Use</h3>
                             <ol>
-                                <li>点击"去购物"按钮跳转到Target官网</li>
-                                <li>选择您需要的商品，确保购物车总额达到$50或以上</li>
-                                <li>在结账页面，找到"优惠码"或"促销代码"输入框</li>
-                                <li>粘贴或输入优惠码: SAVE10</li>
-                                <li>确认折扣已应用，完成支付</li>
+                                <li>Click the "Shop Now" button to go to the store website</li>
+                                <li>Add items to your cart</li>
+                                <li>At checkout, find the "Promo Code" or "Coupon Code" field</li>
+                                <li>Enter the coupon code: <strong id="usageCode">-</strong></li>
+                                <li>Confirm the discount is applied and complete your purchase</li>
                             </ol>
                         </div>
                         <div class="coupon-actions-large">
-                            <button class="btn btn-primary btn-large" onclick="copyCodeAndRedirect('SAVE10', 'https://www.target.com/?ref=harmonygear24&code=SAVE10')">去购物</button>
-                            <button class="btn btn-secondary btn-large" onclick="copyCode('SAVE10')">复制优惠码</button>
+                            <button class="btn btn-primary btn-large" id="shopNowBtn" style="display: none;">Shop Now</button>
+                            <button class="btn btn-secondary btn-large" id="copyCodeBtnLarge" style="display: none;">Copy Code</button>
                         </div>
                     </div>
 
                     <div class="coupon-stats">
                         <div class="stat-item">
-                            <div class="stat-value">1,234</div>
-                            <div class="stat-label">已使用次数</div>
+                            <div class="stat-value" id="usageCount">-</div>
+                            <div class="stat-label">Times Used</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-value">95%</div>
-                            <div class="stat-label">成功率</div>
+                            <div class="stat-value" id="successRate">-</div>
+                            <div class="stat-label">Success Rate</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-value">4.5</div>
-                            <div class="stat-label">用户评分</div>
+                            <div class="stat-value" id="expiryDate">-</div>
+                            <div class="stat-label">Expires</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="detail-sidebar">
                     <div class="sidebar-card">
-                        <h3>现金返还信息</h3>
-                        <p>通过HarmonyGear 24在Target购物，您将获得<strong>11%的现金返还</strong>。现金返还将自动累积到您的账户，最快在首次购买后15天支付。</p>
-                        <a href="register.html" class="btn btn-primary">立即注册</a>
+                        <h3>Cash Back Information</h3>
+                        <p id="cashbackInfo">Loading cash back information...</p>
+                        <a href="register.html" class="btn btn-primary">Join Now</a>
                     </div>
 
                     <div class="sidebar-card">
-                        <h3>相关优惠券</h3>
-                        <div class="related-coupons">
-                            <div class="related-coupon-item">
-                                <span class="related-store">Target</span>
-                                <span class="related-title">满$100减$25</span>
-                                <a href="coupon-detail.html?id=2">查看 →</a>
-                            </div>
-                            <div class="related-coupon-item">
-                                <span class="related-store">Target</span>
-                                <span class="related-title">新用户立减$15</span>
-                                <a href="coupon-detail.html?id=3">查看 →</a>
-                            </div>
+                        <h3>Related Coupons</h3>
+                        <div class="related-coupons" id="relatedCoupons">
+                            <div style="text-align: center; padding: 20px; color: #666;">Loading related coupons...</div>
                         </div>
                     </div>
 
                     <div class="sidebar-card">
-                        <h3>分享优惠券</h3>
+                        <h3>Share Coupon</h3>
                         <div class="share-buttons">
-                            <button class="btn btn-outline btn-small">分享到微信</button>
-                            <button class="btn btn-outline btn-small">分享到微博</button>
+                            <button class="btn btn-outline btn-small" onclick="shareCoupon('facebook')">Share on Facebook</button>
+                            <button class="btn btn-outline btn-small" onclick="shareCoupon('twitter')">Share on Twitter</button>
                         </div>
                     </div>
                 </div>
@@ -183,24 +256,322 @@
     </footer>
 
     <script src="js/main.js"></script>
-    <!-- redirect.js functions are available via window object from main.js or module imports -->
-    <script>
-        // 从URL参数获取优惠券ID，然后从API获取优惠券数据
-        // 在实际应用中，这里会调用API获取优惠券的redirect_url
-        // 示例：
-        // const urlParams = new URLSearchParams(window.location.search);
-        // const couponId = urlParams.get('id');
-        // if (couponId) {
-        //     fetch(`/api/coupons/${couponId}`)
-        //         .then(res => res.json())
-        //         .then(data => {
-        //             if (data.redirect_url) {
-        //                 // 更新"去购物"按钮的跳转链接
-        //                 const shopBtn = document.querySelector('.coupon-actions-large .btn-primary');
-        //                 shopBtn.onclick = () => copyCodeAndRedirect('SAVE10', data.redirect_url);
-        //             }
-        //         });
-        // }
+    <script src="js/auth-modal.js"></script>
+    <script type="module">
+        import { CouponAPI, StoreAPI } from './js/api.js';
+        import { redirectToStore, redirectToCoupon, redirectToProduct, copyCodeAndRedirect } from './js/redirect.js';
+
+        // Make functions globally available
+        window.redirectToStore = redirectToStore;
+        window.redirectToCoupon = redirectToCoupon;
+        window.redirectToProduct = redirectToProduct;
+        window.copyCodeAndRedirect = copyCodeAndRedirect;
+
+        // Get coupon ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const couponId = urlParams.get('id');
+
+        // Show loading state
+        function showLoading() {
+            document.getElementById('loadingState').style.display = 'flex';
+            document.getElementById('errorState').style.display = 'none';
+            document.getElementById('couponDetailSection').style.display = 'none';
+        }
+
+        // Show error state
+        function showError(message) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('errorState').style.display = 'flex';
+            document.getElementById('couponDetailSection').style.display = 'none';
+            document.getElementById('errorText').textContent = message || 'An error occurred while loading the coupon details.';
+        }
+
+        // Show content
+        function showContent() {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('errorState').style.display = 'none';
+            document.getElementById('couponDetailSection').style.display = 'block';
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            if (!dateString) return 'No expiry';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+        }
+
+        // Get random color for store logo
+        function getRandomColor() {
+            const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA15E', '#BC6C25', '#6C5CE7'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        // Load coupon details
+        async function loadCouponDetails() {
+            if (!couponId) {
+                showError('No coupon ID provided in URL.');
+                return;
+            }
+
+            showLoading();
+
+            try {
+                // Load coupon data
+                const couponResult = await CouponAPI.getById(couponId);
+                
+                if (!couponResult.success || !couponResult.data) {
+                    showError(couponResult.error || 'Coupon not found.');
+                    return;
+                }
+
+                const coupon = couponResult.data;
+                
+                // Load store data
+                let store = null;
+                if (coupon.store_id) {
+                    const storeResult = await StoreAPI.getById(coupon.store_id);
+                    if (storeResult.success && storeResult.data) {
+                        store = storeResult.data;
+                    }
+                }
+
+                // Render coupon details
+                renderCouponDetails(coupon, store);
+                
+                // Load related coupons
+                await loadRelatedCoupons(coupon.store_id, couponId);
+
+                showContent();
+            } catch (error) {
+                console.error('Error loading coupon details:', error);
+                showError(error.message || 'Failed to load coupon details.');
+            }
+        }
+
+        // Render coupon details
+        function renderCouponDetails(coupon, store) {
+            // Store header
+            if (store) {
+                document.getElementById('storeName').textContent = store.name;
+                
+                const cashback = store.cashback ? `${store.cashback}% Cash Back` : 'Cash Back Available';
+                document.getElementById('cashbackBadge').textContent = cashback;
+                
+                const logoContainer = document.getElementById('storeLogo');
+                if (store.logo_url && !store.logo_url.includes('via.placeholder.com')) {
+                    logoContainer.innerHTML = `<img src="${store.logo_url}" alt="${store.name}" style="width: 100%; height: 100%; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`;
+                    logoContainer.innerHTML += `<div style="display: none; width: 100%; height: 100%; background-color: ${getRandomColor()}; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 18px;">${store.name}</div>`;
+                } else {
+                    logoContainer.innerHTML = `<div style="width: 100%; height: 100%; background-color: ${getRandomColor()}; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 18px;">${store.name}</div>`;
+                }
+            } else {
+                document.getElementById('storeName').textContent = 'Unknown Store';
+            }
+
+            // Coupon title
+            document.getElementById('couponTitle').textContent = coupon.title || 'Coupon';
+            
+            // Badge
+            if (coupon.is_featured) {
+                document.getElementById('couponBadge').textContent = 'Hot';
+                document.getElementById('couponBadge').style.display = 'inline-block';
+            } else if (coupon.is_new) {
+                document.getElementById('couponBadge').textContent = 'New';
+                document.getElementById('couponBadge').style.display = 'inline-block';
+            }
+
+            // Coupon code
+            if (coupon.code) {
+                document.getElementById('couponCode').textContent = coupon.code;
+                document.getElementById('usageCode').textContent = coupon.code;
+                document.getElementById('couponCodeSection').style.display = 'flex';
+                document.getElementById('copyCodeBtnLarge').style.display = 'inline-block';
+                
+                // Set up copy buttons
+                const copyCode = () => {
+                    navigator.clipboard.writeText(coupon.code).then(() => {
+                        showNotification('Coupon code copied: ' + coupon.code);
+                    });
+                };
+                document.getElementById('copyCodeBtn').onclick = copyCode;
+                document.getElementById('copyCodeBtnLarge').onclick = copyCode;
+            }
+
+            // Description
+            document.getElementById('couponDescription').textContent = coupon.description || coupon.short_description || 'No description available.';
+
+            // Details list
+            const detailsList = document.getElementById('couponDetailsList');
+            detailsList.innerHTML = '';
+            if (coupon.minimum_purchase) {
+                const li = document.createElement('li');
+                li.textContent = `Minimum Purchase: $${coupon.minimum_purchase}`;
+                detailsList.appendChild(li);
+            }
+            if (coupon.discount_amount) {
+                const li = document.createElement('li');
+                li.textContent = `Discount: $${coupon.discount_amount}`;
+                detailsList.appendChild(li);
+            }
+            if (coupon.discount_percentage) {
+                const li = document.createElement('li');
+                li.textContent = `Discount: ${coupon.discount_percentage}%`;
+                detailsList.appendChild(li);
+            }
+            if (coupon.expiry_date) {
+                const li = document.createElement('li');
+                li.textContent = `Expires: ${formatDate(coupon.expiry_date)}`;
+                detailsList.appendChild(li);
+            }
+
+            // Shop Now button
+            if (coupon.redirect_url) {
+                document.getElementById('shopNowBtn').style.display = 'inline-block';
+                document.getElementById('shopNowBtn').onclick = () => {
+                    if (coupon.code) {
+                        copyCodeAndRedirect(coupon.code, coupon.redirect_url);
+                    } else {
+                        window.open(coupon.redirect_url, '_blank');
+                    }
+                };
+            }
+
+            // Stats
+            document.getElementById('usageCount').textContent = (coupon.usage_count || 0).toLocaleString();
+            document.getElementById('successRate').textContent = coupon.success_rate ? `${coupon.success_rate}%` : '-';
+            document.getElementById('expiryDate').textContent = coupon.expiry_date ? formatDate(coupon.expiry_date) : 'No expiry';
+
+            // Cash back info
+            if (store && store.cashback) {
+                document.getElementById('cashbackInfo').innerHTML = `When you shop at <strong>${store.name}</strong> through HarmonyGear 24, you'll get <strong>${store.cashback}% cash back</strong>. Cash back will automatically accumulate in your account and be paid as early as 15 days after your first purchase.`;
+            } else {
+                document.getElementById('cashbackInfo').textContent = 'Cash back is available for this store. Join now to start earning!';
+            }
+        }
+
+        // Load related coupons
+        async function loadRelatedCoupons(storeId, excludeCouponId) {
+            const relatedContainer = document.getElementById('relatedCoupons');
+            
+            try {
+                const result = await CouponAPI.getAll();
+                
+                if (result.success && result.data) {
+                    const related = result.data
+                        .filter(c => c.store_id === storeId && c.id !== excludeCouponId && c.status === 'active')
+                        .slice(0, 3);
+                    
+                    if (related.length > 0) {
+                        relatedContainer.innerHTML = related.map(coupon => `
+                            <div class="related-coupon-item">
+                                <span class="related-store">${coupon.title || 'Coupon'}</span>
+                                <span class="related-title">${coupon.short_description || coupon.description || ''}</span>
+                                <a href="coupon-detail.html?id=${coupon.id}">View →</a>
+                            </div>
+                        `).join('');
+                    } else {
+                        relatedContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">No related coupons found.</div>';
+                    }
+                } else {
+                    relatedContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">Unable to load related coupons.</div>';
+                }
+            } catch (error) {
+                console.error('Error loading related coupons:', error);
+                relatedContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">Error loading related coupons.</div>';
+            }
+        }
+
+        // Share coupon function
+        window.shareCoupon = function(platform) {
+            const url = window.location.href;
+            const title = document.getElementById('couponTitle').textContent;
+            
+            let shareUrl = '';
+            if (platform === 'facebook') {
+                shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+            } else if (platform === 'twitter') {
+                shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`;
+            }
+            
+            if (shareUrl) {
+                window.open(shareUrl, '_blank', 'width=600,height=400');
+            }
+        };
+
+        // Show notification
+        function showNotification(message) {
+            const existing = document.querySelector('.notification');
+            if (existing) existing.remove();
+
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Load coupon details when page loads
+        document.addEventListener('DOMContentLoaded', loadCouponDetails);
     </script>
+    
+    <style>
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            padding: 40px;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color, #007bff);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            padding: 40px;
+        }
+        
+        .error-message {
+            text-align: center;
+            max-width: 500px;
+        }
+        
+        .error-message h2 {
+            color: #dc3545;
+            margin-bottom: 15px;
+        }
+        
+        .error-message p {
+            color: #666;
+            margin-bottom: 25px;
+        }
+        
+        .store-logo-placeholder {
+            width: 150px;
+            height: 75px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+    </style>
 </body>
 </html>

@@ -1,5 +1,66 @@
 // Main JavaScript file
 
+// Utility functions for loading states and error handling
+const UIUtils = {
+    // Show loading spinner in a container
+    showLoading(containerId, message = 'Loading...') {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        
+        container.innerHTML = `
+            <div class="loading-state" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; min-height: 200px;">
+                <div class="loading-spinner" style="width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary-color, #007bff); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px;"></div>
+                <p style="color: #666; margin: 0;">${message}</p>
+            </div>
+        `;
+    },
+    
+    // Show error message in a container
+    showError(containerId, message = 'An error occurred', showRetry = false, retryCallback = null) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        
+        let retryButton = '';
+        if (showRetry && retryCallback) {
+            retryButton = `<button class="btn btn-primary" onclick="${retryCallback.toString().replace(/\s+/g, ' ')}" style="margin-top: 15px;">Retry</button>`;
+        }
+        
+        container.innerHTML = `
+            <div class="error-state" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; min-height: 200px; text-align: center;">
+                <div style="color: #dc3545; font-size: 48px; margin-bottom: 15px;">⚠️</div>
+                <p style="color: #666; margin: 0 0 10px 0;">${message}</p>
+                ${retryButton}
+            </div>
+        `;
+    },
+    
+    // Show empty state
+    showEmpty(containerId, message = 'No items found', icon = '📭') {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        
+        container.innerHTML = `
+            <div class="empty-state" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; min-height: 200px; text-align: center;">
+                <div style="font-size: 48px; margin-bottom: 15px;">${icon}</div>
+                <p style="color: #666; margin: 0;">${message}</p>
+            </div>
+        `;
+    }
+};
+
+// Add spin animation if not already present
+if (!document.getElementById('loading-spinner-style')) {
+    const style = document.createElement('style');
+    style.id = 'loading-spinner-style';
+    style.textContent = `
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
 // Copy coupon code function
 function copyCode(code) {
     navigator.clipboard.writeText(code).then(function() {
@@ -352,3 +413,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Make UIUtils and utility functions globally available
+if (typeof window !== 'undefined') {
+    window.UIUtils = UIUtils;
+    window.copyCode = copyCode;
+    window.showNotification = showNotification;
+    window.performSearch = performSearch;
+    window.checkLoginStatus = checkLoginStatus;
+    window.logout = logout;
+}
