@@ -1995,14 +1995,13 @@ body {
     background-color: var(--white);
     border: 1px solid #E5E5E5;
     border-radius: 8px;
-    padding: 12px;
+    padding: 10px;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 12px;
     transition: box-shadow 0.2s ease;
     cursor: pointer;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    min-height: auto;
     height: auto;
 }
 
@@ -2015,6 +2014,7 @@ body {
     height: 70px;
     min-width: 70px;
     min-height: 70px;
+    max-height: 70px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2028,7 +2028,7 @@ body {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    padding: 10px;
+    padding: 8px;
     background-color: white;
 }
 
@@ -2045,17 +2045,18 @@ body {
     line-height: 1.2;
     word-break: break-word;
     text-transform: uppercase;
-    padding: 10px;
+    padding: 8px;
 }
 
 .hot-deal-content {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
     position: relative;
     min-width: 0;
-    padding-bottom: 28px;
+    padding-bottom: 24px;
+    justify-content: center;
 }
 
 .hot-deal-headline {
