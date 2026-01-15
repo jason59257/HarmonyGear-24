@@ -141,6 +141,33 @@ export default {
                 return await handleDeleteCoupon(id, env);
             }
 
+            // Products routes
+            if (path === '/api/products' && method === 'POST') {
+                const adminResult = await requireAdmin(request, env);
+                if (adminResult.error) {
+                    return errorResponse(adminResult.error, adminResult.status);
+                }
+                return await handleCreateProduct(request, env);
+            }
+            
+            if (path.startsWith('/api/products/') && method === 'PUT') {
+                const adminResult = await requireAdmin(request, env);
+                if (adminResult.error) {
+                    return errorResponse(adminResult.error, adminResult.status);
+                }
+                const id = path.split('/')[3];
+                return await handleUpdateProduct(id, request, env);
+            }
+            
+            if (path.startsWith('/api/products/') && method === 'DELETE') {
+                const adminResult = await requireAdmin(request, env);
+                if (adminResult.error) {
+                    return errorResponse(adminResult.error, adminResult.status);
+                }
+                const id = path.split('/')[3];
+                return await handleDeleteProduct(id, env);
+            }
+
             // Categories routes
             if (path === '/api/categories' && method === 'POST') {
                 const adminResult = await requireAdmin(request, env);
@@ -518,31 +545,32 @@ async function handleCreateCoupon(request, env) {
 }
 
 async function handleUpdateCoupon(id, request, env) {
-    const body = await request.json();
-    const { store_id, title, short_description, code, discount_type, discount_value, min_purchase, max_discount, expiry_date, redirect_url, description, is_active, is_featured, is_deal_of_week, is_hot_deal, deal_of_week_sort_order, hot_deal_sort_order } = body;
+    try {
+        const body = await request.json();
+        const { store_id, title, short_description, code, discount_type, discount_value, min_purchase, max_discount, expiry_date, redirect_url, description, is_active, is_featured, is_deal_of_week, is_hot_deal, deal_of_week_sort_order, hot_deal_sort_order } = body;
 
-    const result = await env.DB.prepare(
-        'UPDATE coupons SET store_id = ?, title = ?, short_description = ?, code = ?, discount_type = ?, discount_value = ?, min_purchase = ?, max_discount = ?, expiry_date = ?, redirect_url = ?, description = ?, is_active = ?, is_featured = ?, is_deal_of_week = ?, is_hot_deal = ?, deal_of_week_sort_order = ?, hot_deal_sort_order = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
-    ).bind(
-        store_id, 
-        title, 
-        short_description, 
-        code, 
-        discount_type, 
-        discount_value, 
-        min_purchase, 
-        max_discount, 
-        expiry_date, 
-        redirect_url, 
-        description, 
-        is_active ? 1 : 0, 
-        is_featured ? 1 : 0,
-        is_deal_of_week || 0,
-        is_hot_deal || 0,
-        deal_of_week_sort_order || 0,
-        hot_deal_sort_order || 0,
-        id
-    ).run();
+        const result = await env.DB.prepare(
+            'UPDATE coupons SET store_id = ?, title = ?, short_description = ?, code = ?, discount_type = ?, discount_value = ?, min_purchase = ?, max_discount = ?, expiry_date = ?, redirect_url = ?, description = ?, is_active = ?, is_featured = ?, is_deal_of_week = ?, is_hot_deal = ?, deal_of_week_sort_order = ?, hot_deal_sort_order = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
+        ).bind(
+            store_id || 0, 
+            title || '', 
+            short_description || '', 
+            code || '', 
+            discount_type || 'percentage', 
+            discount_value !== undefined ? discount_value : 0, 
+            min_purchase !== undefined ? min_purchase : 0, 
+            max_discount !== undefined ? max_discount : 0, 
+            expiry_date || null, 
+            redirect_url || '', 
+            description || '', 
+            is_active !== undefined ? (is_active ? 1 : 0) : 0, 
+            is_featured !== undefined ? (is_featured ? 1 : 0) : 0,
+            is_deal_of_week !== undefined ? (is_deal_of_week ? 1 : 0) : 0,
+            is_hot_deal !== undefined ? (is_hot_deal ? 1 : 0) : 0,
+            deal_of_week_sort_order !== undefined ? deal_of_week_sort_order : 0,
+            hot_deal_sort_order !== undefined ? hot_deal_sort_order : 0,
+            id
+        ).run();
 
         if (result.meta.changes === 0) {
             return errorResponse('Coupon not found', 404);
