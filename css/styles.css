@@ -1988,66 +1988,81 @@ body {
 .hot-deals-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+    gap: 16px;
 }
 
 .hot-deal-card {
     background-color: var(--white);
     border: 1px solid #E5E5E5;
-    border-radius: 12px;
-    padding: 20px;
+    border-radius: 8px;
+    padding: 16px;
     display: flex;
-    align-items: center;
-    gap: 20px;
-    transition: none;
+    align-items: flex-start;
+    gap: 16px;
+    transition: box-shadow 0.2s ease;
     cursor: pointer;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    min-height: 120px;
 }
 
 .hot-deal-card:hover {
-    background-color: var(--white);
-    border: 1px solid #E5E5E5;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    transform: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .hot-deal-logo-area {
-    width: 70px;
-    height: 70px;
-    min-width: 70px;
-    min-height: 70px;
+    width: 80px;
+    height: 80px;
+    min-width: 80px;
+    min-height: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: var(--white);
+    background-color: #F5F5F5;
     border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.hot-deal-logo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 8px;
 }
 
 .hot-deal-logo {
-    color: #2C2C2C;
-    font-size: 14px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 11px;
     font-weight: 600;
     text-align: center;
-    line-height: 1.3;
+    line-height: 1.2;
     word-break: break-word;
     text-transform: uppercase;
+    padding: 8px;
 }
 
 .hot-deal-content {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
     position: relative;
     min-width: 0;
+    padding-bottom: 32px;
 }
 
 .hot-deal-headline {
-    font-size: 15px;
-    font-weight: 600;
+    font-size: 14px;
+    font-weight: 500;
     color: #2C2C2C;
-    line-height: 1.4;
+    line-height: 1.5;
     text-align: left;
+    margin: 0;
 }
 
 .hot-deal-cashback {
@@ -2055,16 +2070,18 @@ body {
     align-items: baseline;
     gap: 4px;
     text-align: left;
+    flex-wrap: wrap;
 }
 
 .hot-deal-current {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
-    color: var(--primary-color);
+    color: #6B46C1;
+    line-height: 1.4;
 }
 
 .hot-deal-was {
-    font-size: 13px;
+    font-size: 12px;
     color: #999999;
     font-weight: 400;
 }
@@ -2073,13 +2090,13 @@ body {
     position: absolute;
     right: 0;
     bottom: 0;
-    transform: none;
-    background-color: #6B46C1;
-    color: #FFFFFF;
-    border: none;
+    background-color: transparent;
+    color: #6B46C1;
+    border: 1px solid #6B46C1;
     border-radius: 20px;
-    padding: 8px 20px;
+    padding: 6px 16px;
     font-size: 13px;
+    font-weight: 500;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s;

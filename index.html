@@ -1475,7 +1475,7 @@
                     // Filter coupons that are marked as hot deal and active
                     const coupons = result.data.filter(c => (c.is_active === 1 || c.is_active === true) && c.is_hot_deal === 1)
                         .sort((a, b) => (a.hot_deal_sort_order || 0) - (b.hot_deal_sort_order || 0))
-                        .slice(0, 4);
+                        .slice(0, 10);
                     if (coupons.length > 0) {
                         const storesResult = await StoreAPI.getAll();
                         const storesMap = {};
@@ -1484,19 +1484,51 @@
                         }
                         
                         container.innerHTML = coupons.map(coupon => {
-                            const store = storesMap[coupon.store_id] || { name: 'Store' };
-                            const title = coupon.title || coupon.short_description || '';
+                            const store = storesMap[coupon.store_id] || { name: 'Store', logo_url: '', cashback: 0, cashback_was: null };
+                            const title = coupon.title || coupon.short_description || coupon.description || '';
+                            const description = coupon.short_description || coupon.description || title;
                             
-                            return `<div class="hot-deal-card" data-dynamic="true" onclick="copyCodeAndRedirect('${coupon.code || ''}', '${coupon.redirect_url || ''}')">
+                            // Determine button text based on coupon type
+                            let buttonText = 'Shop';
+                            if (coupon.code) {
+                                buttonText = 'Get Code';
+                            } else if (description.toLowerCase().includes('learn') || description.toLowerCase().includes('how')) {
+                                buttonText = 'See Details';
+                            }
+                            
+                            // Format cashback display
+                            let cashbackDisplay = '';
+                            if (store.cashback && store.cashback > 0) {
+                                cashbackDisplay = `${store.cashback}% Cash Back`;
+                                if (store.cashback_was && store.cashback_was > 0 && store.cashback_was !== store.cashback) {
+                                    cashbackDisplay += ` <span class="hot-deal-was">was ${store.cashback_was}%</span>`;
+                                }
+                            } else if (coupon.discount_value) {
+                                if (coupon.discount_type === 'fixed') {
+                                    cashbackDisplay = `$${coupon.discount_value} OFF`;
+                                } else {
+                                    cashbackDisplay = `${coupon.discount_value}% OFF`;
+                                }
+                            } else {
+                                cashbackDisplay = 'Deal Available';
+                            }
+                            
+                            // Store logo
+                            const logoUrl = store.logo_url && !store.logo_url.includes('via.placeholder.com') ? store.logo_url : '';
+                            const storeName = store.name || 'Store';
+                            const bgColor = getRandomColor();
+                            
+                            return `<div class="hot-deal-card" data-dynamic="true" onclick="copyCodeAndRedirect('${coupon.code || ''}', '${coupon.redirect_url || store.redirect_url || ''}')">
                                 <div class="hot-deal-logo-area">
-                                    <div class="hot-deal-logo">${store.name.substring(0, 10)}</div>
+                                    ${logoUrl ? `<img src="${logoUrl}" alt="${storeName}" class="hot-deal-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
+                                    <div class="hot-deal-logo" style="${logoUrl ? 'display: none;' : 'display: flex;'} background-color: ${bgColor}; color: white; font-weight: 600; font-size: 12px; padding: 8px; border-radius: 6px; align-items: center; justify-content: center; text-align: center; line-height: 1.2;">${storeName.substring(0, 15)}</div>
                                 </div>
                                 <div class="hot-deal-content">
-                                    <div class="hot-deal-headline">${title.substring(0, 50)}${title.length > 50 ? '...' : ''}</div>
+                                    <div class="hot-deal-headline">${description.substring(0, 80)}${description.length > 80 ? '...' : ''}</div>
                                     <div class="hot-deal-cashback">
-                                        <span class="hot-deal-current">${coupon.discount_value ? (coupon.discount_type === 'fixed' ? `$${coupon.discount_value} OFF` : `${coupon.discount_value}% OFF`) : 'Deal'}</span>
+                                        <span class="hot-deal-current">${cashbackDisplay}</span>
                                     </div>
-                                    <button class="hot-deal-btn">Shop</button>
+                                    <button class="hot-deal-btn">${buttonText}</button>
                                 </div>
                             </div>`;
                         }).join('');
