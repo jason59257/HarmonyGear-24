@@ -141,6 +141,7 @@
                                     <th>Store</th>
                                     <th>Discount</th>
                                     <th>Expires</th>
+                                    <th>Homepage Display</th>
                                     <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
@@ -269,7 +270,7 @@
             if (!tbody) return;
 
             if (couponsList.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">No coupons found</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;">No coupons found</td></tr>';
                 return;
             }
 
@@ -285,6 +286,11 @@
                         <td>${storeName}</td>
                         <td>${formatDiscount(coupon)}</td>
                         <td>${expiryDate}</td>
+                        <td>
+                            ${coupon.is_deal_of_week ? '<span class="admin-badge" style="background: #6B46C1; margin-right: 4px;">Deal of Week</span>' : ''}
+                            ${coupon.is_hot_deal ? '<span class="admin-badge" style="background: #EF4444; margin-right: 4px;">Hot Deal</span>' : ''}
+                            ${!coupon.is_deal_of_week && !coupon.is_hot_deal ? '<span style="color: var(--admin-text-light);">-</span>' : ''}
+                        </td>
                         <td><span class="admin-badge ${status === 'Active' ? 'success' : 'danger'}">${status}</span></td>
                         <td>
                             <button class="admin-btn-icon" title="Edit" onclick="window.editCoupon(${coupon.id})">
@@ -335,6 +341,33 @@
                             ${createFormField('Expiry Date', 'expiry_date', 'date', '', { placeholder: 'YYYY-MM-DD' })}
                             ${createFormField('Description', 'description', 'textarea', '', { placeholder: 'Full description' })}
                             ${createFormField('Status', 'is_active', 'select', 'true', { options: [{ value: 'true', label: 'Active' }, { value: 'false', label: 'Inactive' }] })}
+                            <div class="admin-form-group">
+                                <label class="admin-form-label">Homepage Display</label>
+                                <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 8px;">
+                                    <div style="display: flex; flex-direction: column; gap: 8px; padding: 12px; background: #f5f5f5; border-radius: 6px;">
+                                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                            <input type="checkbox" name="is_deal_of_week" value="1" style="width: 18px; height: 18px; cursor: pointer;">
+                                            <span style="flex: 1;">显示在 Deals and Coupons of the Week 版块</span>
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: 8px; margin-left: 26px; font-size: 13px; color: #666;">
+                                            <span>排序顺序:</span>
+                                            <input type="number" name="deal_of_week_sort_order" value="0" min="0" style="width: 80px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                            <span style="font-size: 12px; color: #999;">(数字越小越靠前)</span>
+                                        </label>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; gap: 8px; padding: 12px; background: #f5f5f5; border-radius: 6px;">
+                                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                            <input type="checkbox" name="is_hot_deal" value="1" style="width: 18px; height: 18px; cursor: pointer;">
+                                            <span style="flex: 1;">显示在 Hot Deals and Coupons 版块</span>
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: 8px; margin-left: 26px; font-size: 13px; color: #666;">
+                                            <span>排序顺序:</span>
+                                            <input type="number" name="hot_deal_sort_order" value="0" min="0" style="width: 80px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                            <span style="font-size: 12px; color: #999;">(数字越小越靠前)</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
                 </form>
             `;
 
@@ -370,6 +403,33 @@
                             ${createFormField('Expiry Date', 'expiry_date', 'date', coupon.expiry_date || '', { placeholder: 'YYYY-MM-DD' })}
                             ${createFormField('Description', 'description', 'textarea', coupon.description || '', { placeholder: 'Full description' })}
                             ${createFormField('Status', 'is_active', 'select', coupon.is_active ? 'true' : 'false', { options: [{ value: 'true', label: 'Active' }, { value: 'false', label: 'Inactive' }] })}
+                            <div class="admin-form-group">
+                                <label class="admin-form-label">Homepage Display</label>
+                                <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 8px;">
+                                    <div style="display: flex; flex-direction: column; gap: 8px; padding: 12px; background: #f5f5f5; border-radius: 6px;">
+                                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                            <input type="checkbox" name="is_deal_of_week" value="1" ${coupon.is_deal_of_week ? 'checked' : ''} style="width: 18px; height: 18px; cursor: pointer;">
+                                            <span style="flex: 1;">显示在 Deals and Coupons of the Week 版块</span>
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: 8px; margin-left: 26px; font-size: 13px; color: #666;">
+                                            <span>排序顺序:</span>
+                                            <input type="number" name="deal_of_week_sort_order" value="${coupon.deal_of_week_sort_order || 0}" min="0" style="width: 80px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                            <span style="font-size: 12px; color: #999;">(数字越小越靠前)</span>
+                                        </label>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; gap: 8px; padding: 12px; background: #f5f5f5; border-radius: 6px;">
+                                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                            <input type="checkbox" name="is_hot_deal" value="1" ${coupon.is_hot_deal ? 'checked' : ''} style="width: 18px; height: 18px; cursor: pointer;">
+                                            <span style="flex: 1;">显示在 Hot Deals and Coupons 版块</span>
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: 8px; margin-left: 26px; font-size: 13px; color: #666;">
+                                            <span>排序顺序:</span>
+                                            <input type="number" name="hot_deal_sort_order" value="${coupon.hot_deal_sort_order || 0}" min="0" style="width: 80px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                            <span style="font-size: 12px; color: #999;">(数字越小越靠前)</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
                         </form>
                     `;
 
@@ -423,6 +483,17 @@
             formData.store_id = parseInt(formData.store_id);
             formData.discount_value = parseFloat(formData.discount_value);
             formData.is_active = formData.is_active === 'true';
+            // Handle checkbox values (convert to integers)
+            // FormData doesn't include unchecked checkboxes, so we need to check explicitly
+            const isDealOfWeekCheckbox = document.querySelector('input[name="is_deal_of_week"]');
+            const isHotDealCheckbox = document.querySelector('input[name="is_hot_deal"]');
+            const dealOfWeekSortOrderInput = document.querySelector('input[name="deal_of_week_sort_order"]');
+            const hotDealSortOrderInput = document.querySelector('input[name="hot_deal_sort_order"]');
+            
+            formData.is_deal_of_week = (isDealOfWeekCheckbox && isDealOfWeekCheckbox.checked) ? 1 : 0;
+            formData.is_hot_deal = (isHotDealCheckbox && isHotDealCheckbox.checked) ? 1 : 0;
+            formData.deal_of_week_sort_order = dealOfWeekSortOrderInput ? parseInt(dealOfWeekSortOrderInput.value) || 0 : 0;
+            formData.hot_deal_sort_order = hotDealSortOrderInput ? parseInt(hotDealSortOrderInput.value) || 0 : 0;
             if (formData.min_purchase) {
                 formData.min_purchase = parseFloat(formData.min_purchase);
             }

@@ -135,6 +135,7 @@
                                     <th>Store Name</th>
                                     <th>Category</th>
                                     <th>Cashback</th>
+                                    <th>Homepage Display</th>
                                     <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
@@ -261,7 +262,7 @@
             if (!tbody) return;
 
             if (storesList.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px;">No stores found</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">No stores found</td></tr>';
                 return;
             }
 
@@ -270,6 +271,11 @@
                     <td><strong>${store.name}</strong></td>
                     <td>${store.category || 'N/A'}</td>
                     <td>${store.cashback ? store.cashback + '%' : 'N/A'}</td>
+                    <td>
+                        ${store.is_popular ? '<span class="admin-badge" style="background: #6B46C1; margin-right: 4px;">Popular</span>' : ''}
+                        ${store.is_extra_cashback ? '<span class="admin-badge" style="background: #10B981; margin-right: 4px;">Extra Cash</span>' : ''}
+                        ${!store.is_popular && !store.is_extra_cashback ? '<span style="color: var(--admin-text-light);">-</span>' : ''}
+                    </td>
                     <td><span class="admin-badge ${store.status === 'active' ? 'success' : 'danger'}">${store.status || 'active'}</span></td>
                     <td>
                         <button class="admin-btn-icon" title="Edit" onclick="window.editStore(${store.id})">
@@ -306,6 +312,33 @@
                     </div>
                     ${createFormField('Description', 'description', 'textarea', '', { placeholder: 'Store description' })}
                     ${createFormField('Status', 'status', 'select', 'active', { options: [{ value: 'active', label: 'Active' }, { value: 'inactive', label: 'Inactive' }] })}
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">Homepage Display</label>
+                        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 8px;">
+                            <div style="display: flex; flex-direction: column; gap: 8px; padding: 12px; background: #f5f5f5; border-radius: 6px;">
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" name="is_popular" value="1" style="width: 18px; height: 18px; cursor: pointer;">
+                                    <span style="flex: 1;">显示在 Popular Stores 版块</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; margin-left: 26px; font-size: 13px; color: #666;">
+                                    <span>排序顺序:</span>
+                                    <input type="number" name="popular_sort_order" value="0" min="0" style="width: 80px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                    <span style="font-size: 12px; color: #999;">(数字越小越靠前)</span>
+                                </label>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 8px; padding: 12px; background: #f5f5f5; border-radius: 6px;">
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" name="is_extra_cashback" value="1" style="width: 18px; height: 18px; cursor: pointer;">
+                                    <span style="flex: 1;">显示在 Extra Cash Back Stores 版块</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; margin-left: 26px; font-size: 13px; color: #666;">
+                                    <span>排序顺序:</span>
+                                    <input type="number" name="extra_cashback_sort_order" value="0" min="0" style="width: 80px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                    <span style="font-size: 12px; color: #999;">(数字越小越靠前)</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
                 </form>
             `;
 
@@ -341,14 +374,6 @@
                     uploader.createUploadComponent('storeLogoUpload');
                 }
             }, 100);
-
-            showModal({
-                title: 'Add New Store',
-                content: formContent,
-                size: 'medium',
-                onSubmit: handleStoreSubmit,
-                submitText: 'Add Store'
-            });
         };
 
         // Edit store
@@ -374,6 +399,33 @@
                             </div>
                             ${createFormField('Description', 'description', 'textarea', store.description || '', { placeholder: 'Store description' })}
                             ${createFormField('Status', 'status', 'select', store.status || 'active', { options: [{ value: 'active', label: 'Active' }, { value: 'inactive', label: 'Inactive' }] })}
+                            <div class="admin-form-group">
+                                <label class="admin-form-label">Homepage Display</label>
+                                <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 8px;">
+                                    <div style="display: flex; flex-direction: column; gap: 8px; padding: 12px; background: #f5f5f5; border-radius: 6px;">
+                                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                            <input type="checkbox" name="is_popular" value="1" ${store.is_popular ? 'checked' : ''} style="width: 18px; height: 18px; cursor: pointer;">
+                                            <span style="flex: 1;">显示在 Popular Stores 版块</span>
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: 8px; margin-left: 26px; font-size: 13px; color: #666;">
+                                            <span>排序顺序:</span>
+                                            <input type="number" name="popular_sort_order" value="${store.popular_sort_order || 0}" min="0" style="width: 80px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                            <span style="font-size: 12px; color: #999;">(数字越小越靠前)</span>
+                                        </label>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; gap: 8px; padding: 12px; background: #f5f5f5; border-radius: 6px;">
+                                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                            <input type="checkbox" name="is_extra_cashback" value="1" ${store.is_extra_cashback ? 'checked' : ''} style="width: 18px; height: 18px; cursor: pointer;">
+                                            <span style="flex: 1;">显示在 Extra Cash Back Stores 版块</span>
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: 8px; margin-left: 26px; font-size: 13px; color: #666;">
+                                            <span>排序顺序:</span>
+                                            <input type="number" name="extra_cashback_sort_order" value="${store.extra_cashback_sort_order || 0}" min="0" style="width: 80px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                            <span style="font-size: 12px; color: #999;">(数字越小越靠前)</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
                         </form>
                     `;
 
@@ -450,6 +502,18 @@
             if (formData.cashback) {
                 formData.cashback = parseFloat(formData.cashback);
             }
+            
+            // Handle checkbox values (convert to integers)
+            // FormData doesn't include unchecked checkboxes, so we need to check explicitly
+            const isPopularCheckbox = document.querySelector('input[name="is_popular"]');
+            const isExtraCashbackCheckbox = document.querySelector('input[name="is_extra_cashback"]');
+            const popularSortOrderInput = document.querySelector('input[name="popular_sort_order"]');
+            const extraCashbackSortOrderInput = document.querySelector('input[name="extra_cashback_sort_order"]');
+            
+            formData.is_popular = (isPopularCheckbox && isPopularCheckbox.checked) ? 1 : 0;
+            formData.is_extra_cashback = (isExtraCashbackCheckbox && isExtraCashbackCheckbox.checked) ? 1 : 0;
+            formData.popular_sort_order = popularSortOrderInput ? parseInt(popularSortOrderInput.value) || 0 : 0;
+            formData.extra_cashback_sort_order = extraCashbackSortOrderInput ? parseInt(extraCashbackSortOrderInput.value) || 0 : 0;
             
             // Get logo URL from upload component
             const logoUploadContainer = document.getElementById('storeLogoUpload');
