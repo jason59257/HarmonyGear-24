@@ -1540,9 +1540,9 @@
                         }).join('');
                         
                         // Force container and children visible
-                        container.style.cssText = 'display: grid !important; visibility: visible !important; opacity: 1 !important; min-height: 300px !important; height: auto !important; width: 100% !important;';
+                        container.style.cssText = 'display: grid !important; visibility: visible !important; opacity: 1 !important; height: auto !important; width: 100% !important;';
                         Array.from(container.children).forEach(child => {
-                            child.style.cssText = 'display: flex !important; visibility: visible !important; opacity: 1 !important; width: 100% !important; height: auto !important; min-height: 120px !important; position: relative !important; z-index: 1 !important;';
+                            child.style.cssText = 'display: flex !important; visibility: visible !important; opacity: 1 !important; width: 100% !important; height: auto !important; position: relative !important; z-index: 1 !important;';
                         });
                     }
                 }
