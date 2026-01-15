@@ -409,18 +409,18 @@ async function handleUpdateStore(id, request, env) {
         const result = await env.DB.prepare(
             'UPDATE stores SET name = ?, category = ?, cashback = ?, website_url = ?, redirect_url = ?, logo_url = ?, description = ?, status = ?, is_popular = ?, is_extra_cashback = ?, popular_sort_order = ?, extra_cashback_sort_order = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
         ).bind(
-            name, 
-            category, 
-            cashback, 
-            website_url, 
-            redirect_url, 
-            logo_url, 
-            description, 
-            status,
-            is_popular || 0,
-            is_extra_cashback || 0,
-            popular_sort_order || 0,
-            extra_cashback_sort_order || 0,
+            name || '', 
+            category || '', 
+            cashback !== undefined ? cashback : 0, 
+            website_url || '', 
+            redirect_url || '', 
+            logo_url || '', 
+            description || '', 
+            status || 'active',
+            is_popular !== undefined ? (is_popular ? 1 : 0) : 0,
+            is_extra_cashback !== undefined ? (is_extra_cashback ? 1 : 0) : 0,
+            popular_sort_order !== undefined ? popular_sort_order : 0,
+            extra_cashback_sort_order !== undefined ? extra_cashback_sort_order : 0,
             id
         ).run();
 
@@ -544,15 +544,21 @@ async function handleUpdateCoupon(id, request, env) {
         id
     ).run();
 
-    if (result.meta.changes === 0) {
-        return errorResponse('Coupon not found', 404);
+        if (result.meta.changes === 0) {
+            return errorResponse('Coupon not found', 404);
+        }
+
+        const updatedCoupon = await env.DB.prepare(
+            'SELECT c.*, s.name as store_name FROM coupons c LEFT JOIN stores s ON c.store_id = s.id WHERE c.id = ?'
+        ).bind(id).first();
+
+        console.log('handleUpdateCoupon - Coupon updated successfully');
+        return jsonResponse({ success: true, data: updatedCoupon });
+    } catch (error) {
+        console.error('handleUpdateCoupon - Error:', error);
+        console.error('handleUpdateCoupon - Error stack:', error.stack);
+        return errorResponse('Failed to update coupon: ' + error.message, 500);
     }
-
-    const updatedCoupon = await env.DB.prepare(
-        'SELECT c.*, s.name as store_name FROM coupons c LEFT JOIN stores s ON c.store_id = s.id WHERE c.id = ?'
-    ).bind(id).first();
-
-    return jsonResponse({ success: true, data: updatedCoupon });
 }
 
 async function handleDeleteCoupon(id, env) {
