@@ -1995,14 +1995,15 @@ body {
     background-color: var(--white);
     border: 1px solid #E5E5E5;
     border-radius: 8px;
-    padding: 16px;
+    padding: 12px;
     display: flex;
     align-items: flex-start;
-    gap: 16px;
+    gap: 12px;
     transition: box-shadow 0.2s ease;
     cursor: pointer;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    min-height: 120px;
+    min-height: auto;
+    height: auto;
 }
 
 .hot-deal-card:hover {
@@ -2010,10 +2011,10 @@ body {
 }
 
 .hot-deal-logo-area {
-    width: 90px;
-    height: 90px;
-    min-width: 90px;
-    min-height: 90px;
+    width: 70px;
+    height: 70px;
+    min-width: 70px;
+    min-height: 70px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2051,20 +2052,19 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 6px;
     position: relative;
     min-width: 0;
-    padding-bottom: 32px;
+    padding-bottom: 28px;
 }
 
 .hot-deal-headline {
     font-size: 14px;
     font-weight: 400;
     color: #2C2C2C;
-    line-height: 1.5;
+    line-height: 1.4;
     text-align: left;
     margin: 0;
-    margin-bottom: 4px;
 }
 
 .hot-deal-cashback {
@@ -2073,7 +2073,6 @@ body {
     gap: 4px;
     text-align: left;
     flex-wrap: wrap;
-    margin-bottom: 8px;
 }
 
 .hot-deal-current {
@@ -2097,8 +2096,8 @@ body {
     color: #6B46C1;
     border: 1px solid #6B46C1;
     border-radius: 20px;
-    padding: 6px 16px;
-    font-size: 13px;
+    padding: 5px 14px;
+    font-size: 12px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
