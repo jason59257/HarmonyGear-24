@@ -1518,17 +1518,23 @@
                             const storeName = store.name || 'Store';
                             const bgColor = getRandomColor();
                             
-                            return `<div class="hot-deal-card" data-dynamic="true" onclick="copyCodeAndRedirect('${coupon.code || ''}', '${coupon.redirect_url || store.redirect_url || ''}')">
+                            const safeDescription = (description || '').replace(/'/g, "&#39;").replace(/"/g, "&quot;");
+                            const safeRedirectUrl = (coupon.redirect_url || store.redirect_url || '').replace(/'/g, "&#39;");
+                            const safeCode = (coupon.code || '').replace(/'/g, "&#39;");
+                            
+                            return `<div class="hot-deal-card" data-dynamic="true" onclick="copyCodeAndRedirect('${safeCode}', '${safeRedirectUrl}')">
                                 <div class="hot-deal-logo-area">
                                     ${logoUrl ? `<img src="${logoUrl}" alt="${storeName}" class="hot-deal-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
-                                    <div class="hot-deal-logo" style="${logoUrl ? 'display: none;' : 'display: flex;'} background-color: ${bgColor}; color: white; font-weight: 600; font-size: 12px; padding: 8px; border-radius: 6px; align-items: center; justify-content: center; text-align: center; line-height: 1.2;">${storeName.substring(0, 15)}</div>
+                                    <div class="hot-deal-logo" style="${logoUrl ? 'display: none;' : 'display: flex;'} background-color: ${bgColor};">
+                                        ${storeName.substring(0, 20)}
+                                    </div>
                                 </div>
                                 <div class="hot-deal-content">
-                                    <div class="hot-deal-headline">${description.substring(0, 80)}${description.length > 80 ? '...' : ''}</div>
+                                    <div class="hot-deal-headline">${safeDescription.substring(0, 80)}${description.length > 80 ? '...' : ''}</div>
                                     <div class="hot-deal-cashback">
                                         <span class="hot-deal-current">${cashbackDisplay}</span>
                                     </div>
-                                    <button class="hot-deal-btn">${buttonText}</button>
+                                    <button class="hot-deal-btn" onclick="event.stopPropagation(); copyCodeAndRedirect('${safeCode}', '${safeRedirectUrl}');">${buttonText}</button>
                                 </div>
                             </div>`;
                         }).join('');
