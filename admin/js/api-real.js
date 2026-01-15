@@ -277,11 +277,48 @@ export const ProductAPI = {
 
     async getById(id) {
         try {
-            const products = await this.getAll();
-            const product = products.data?.find(p => p.id === parseInt(id));
-            return product ? { success: true, data: product } : { success: false, error: 'Product not found' };
+            const result = await apiRequest(`/api/products/${id}`);
+            return result;
         } catch (error) {
             console.error('ProductAPI.getById error:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async create(productData) {
+        try {
+            const result = await apiRequest('/api/products', {
+                method: 'POST',
+                body: JSON.stringify(productData),
+            });
+            return result;
+        } catch (error) {
+            console.error('ProductAPI.create error:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async update(id, productData) {
+        try {
+            const result = await apiRequest(`/api/products/${id}`, {
+                method: 'PUT',
+                body: JSON.stringify(productData),
+            });
+            return result;
+        } catch (error) {
+            console.error('ProductAPI.update error:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async delete(id) {
+        try {
+            const result = await apiRequest(`/api/products/${id}`, {
+                method: 'DELETE',
+            });
+            return result;
+        } catch (error) {
+            console.error('ProductAPI.delete error:', error);
             return { success: false, error: error.message };
         }
     }
@@ -379,6 +416,67 @@ export const AdminAuthAPI = {
     }
 };
 
+// Hero Banner API
+export const HeroBannerAPI = {
+    async getAll() {
+        try {
+            const result = await apiRequest('/api/banners', {}, false); // Public endpoint
+            return { success: true, data: result.data || [] };
+        } catch (error) {
+            console.error('HeroBannerAPI.getAll error:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async getById(id) {
+        try {
+            const result = await apiRequest(`/api/banners/${id}`, {}, false); // Public endpoint
+            return result;
+        } catch (error) {
+            console.error('HeroBannerAPI.getById error:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async create(bannerData) {
+        try {
+            const result = await apiRequest('/api/banners', {
+                method: 'POST',
+                body: JSON.stringify(bannerData),
+            });
+            return result;
+        } catch (error) {
+            console.error('HeroBannerAPI.create error:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async update(id, bannerData) {
+        try {
+            const result = await apiRequest(`/api/banners/${id}`, {
+                method: 'PUT',
+                body: JSON.stringify(bannerData),
+            });
+            return result;
+        } catch (error) {
+            console.error('HeroBannerAPI.update error:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async delete(id) {
+        try {
+            const result = await apiRequest(`/api/banners/${id}`, {
+                method: 'DELETE',
+            });
+            return result;
+        } catch (error) {
+            console.error('HeroBannerAPI.delete error:', error);
+            return { success: false, error: error.message };
+        }
+    }
+};
+
 // Export all APIs
 export default {
     StoreAPI,
@@ -388,5 +486,6 @@ export default {
     AnalyticsAPI,
     ImageAPI,
     ProductAPI,
+    HeroBannerAPI,
     AdminAuthAPI
 };
