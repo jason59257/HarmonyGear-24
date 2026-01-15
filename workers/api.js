@@ -75,6 +75,10 @@ export default {
             if (path === '/api/categories' && method === 'GET') {
                 return await handleGetCategories(env);
             }
+            
+            if (path === '/api/banners' && method === 'GET') {
+                return await handleGetBanners(env);
+            }
 
             // Protected routes (require authentication)
             const authResult = await requireAuth(request, env);
@@ -156,6 +160,33 @@ export default {
                     return errorResponse(adminResult.error, adminResult.status);
                 }
                 return await handleGetUsers(env);
+            }
+
+            // Hero Banners routes (admin only)
+            if (path === '/api/banners' && method === 'POST') {
+                const adminResult = await requireAdmin(request, env);
+                if (adminResult.error) {
+                    return errorResponse(adminResult.error, adminResult.status);
+                }
+                return await handleCreateBanner(request, env);
+            }
+            
+            if (path.startsWith('/api/banners/') && method === 'PUT') {
+                const adminResult = await requireAdmin(request, env);
+                if (adminResult.error) {
+                    return errorResponse(adminResult.error, adminResult.status);
+                }
+                const id = path.split('/')[3];
+                return await handleUpdateBanner(id, request, env);
+            }
+            
+            if (path.startsWith('/api/banners/') && method === 'DELETE') {
+                const adminResult = await requireAdmin(request, env);
+                if (adminResult.error) {
+                    return errorResponse(adminResult.error, adminResult.status);
+                }
+                const id = path.split('/')[3];
+                return await handleDeleteBanner(id, env);
             }
 
             // Image upload route
@@ -316,41 +347,98 @@ async function handleGetStore(id, env) {
 }
 
 async function handleCreateStore(request, env) {
-    const body = await request.json();
-    const { name, category, cashback, website_url, redirect_url, logo_url, description, status } = body;
+    try {
+        const body = await request.json();
+        const { name, category, cashback, website_url, redirect_url, logo_url, description, status, is_popular, is_extra_cashback, popular_sort_order, extra_cashback_sort_order } = body;
 
-    if (!name) {
-        return errorResponse('Store name is required', 400);
+        if (!name) {
+            return errorResponse('Store name is required', 400);
+        }
+
+        console.log('handleCreateStore - Creating store:', {
+            name,
+            is_popular,
+            is_extra_cashback,
+            popular_sort_order,
+            extra_cashback_sort_order
+        });
+
+        const result = await env.DB.prepare(
+            'INSERT INTO stores (name, category, cashback, website_url, redirect_url, logo_url, description, status, is_popular, is_extra_cashback, popular_sort_order, extra_cashback_sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+        ).bind(
+            name, 
+            category || '', 
+            cashback || 0, 
+            website_url || '', 
+            redirect_url || '', 
+            logo_url || '', 
+            description || '', 
+            status || 'active',
+            is_popular || 0,
+            is_extra_cashback || 0,
+            popular_sort_order || 0,
+            extra_cashback_sort_order || 0
+        ).run();
+
+        const newStore = await env.DB.prepare(
+            'SELECT * FROM stores WHERE id = ?'
+        ).bind(result.meta.last_row_id).first();
+
+        console.log('handleCreateStore - Store created successfully');
+        return jsonResponse({ success: true, data: newStore }, 201);
+    } catch (error) {
+        console.error('handleCreateStore - Error:', error);
+        console.error('handleCreateStore - Error stack:', error.stack);
+        return errorResponse('Failed to create store: ' + error.message, 500);
     }
-
-    const result = await env.DB.prepare(
-        'INSERT INTO stores (name, category, cashback, website_url, redirect_url, logo_url, description, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
-    ).bind(name, category || '', cashback || 0, website_url || '', redirect_url || '', logo_url || '', description || '', status || 'active').run();
-
-    const newStore = await env.DB.prepare(
-        'SELECT * FROM stores WHERE id = ?'
-    ).bind(result.meta.last_row_id).first();
-
-    return jsonResponse({ success: true, data: newStore }, 201);
 }
 
 async function handleUpdateStore(id, request, env) {
-    const body = await request.json();
-    const { name, category, cashback, website_url, redirect_url, logo_url, description, status } = body;
+    try {
+        const body = await request.json();
+        const { name, category, cashback, website_url, redirect_url, logo_url, description, status, is_popular, is_extra_cashback, popular_sort_order, extra_cashback_sort_order } = body;
 
-    const result = await env.DB.prepare(
-        'UPDATE stores SET name = ?, category = ?, cashback = ?, website_url = ?, redirect_url = ?, logo_url = ?, description = ?, status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
-    ).bind(name, category, cashback, website_url, redirect_url, logo_url, description, status, id).run();
+        console.log('handleUpdateStore - Updating store:', id, {
+            name,
+            is_popular,
+            is_extra_cashback,
+            popular_sort_order,
+            extra_cashback_sort_order
+        });
 
-    if (result.meta.changes === 0) {
-        return errorResponse('Store not found', 404);
+        const result = await env.DB.prepare(
+            'UPDATE stores SET name = ?, category = ?, cashback = ?, website_url = ?, redirect_url = ?, logo_url = ?, description = ?, status = ?, is_popular = ?, is_extra_cashback = ?, popular_sort_order = ?, extra_cashback_sort_order = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
+        ).bind(
+            name, 
+            category, 
+            cashback, 
+            website_url, 
+            redirect_url, 
+            logo_url, 
+            description, 
+            status,
+            is_popular || 0,
+            is_extra_cashback || 0,
+            popular_sort_order || 0,
+            extra_cashback_sort_order || 0,
+            id
+        ).run();
+
+        if (result.meta.changes === 0) {
+            return errorResponse('Store not found', 404);
+        }
+
+        const updatedStore = await env.DB.prepare(
+            'SELECT * FROM stores WHERE id = ?'
+        ).bind(id).first();
+
+        console.log('handleUpdateStore - Store updated successfully');
+        return jsonResponse({ success: true, data: updatedStore });
+    } catch (error) {
+        console.error('handleUpdateStore - Error:', error);
+        console.error('handleUpdateStore - Error stack:', error.stack);
+        return errorResponse('Failed to update store: ' + error.message, 500);
     }
-
-    const updatedStore = await env.DB.prepare(
-        'SELECT * FROM stores WHERE id = ?'
-    ).bind(id).first();
-
-    return jsonResponse({ success: true, data: updatedStore });
 }
 
 async function handleDeleteStore(id, env) {
@@ -394,15 +482,33 @@ async function handleGetCoupon(id, env) {
 
 async function handleCreateCoupon(request, env) {
     const body = await request.json();
-    const { store_id, title, short_description, code, discount_type, discount_value, min_purchase, max_discount, expiry_date, redirect_url, description, is_active, is_featured } = body;
+    const { store_id, title, short_description, code, discount_type, discount_value, min_purchase, max_discount, expiry_date, redirect_url, description, is_active, is_featured, is_deal_of_week, is_hot_deal, deal_of_week_sort_order, hot_deal_sort_order } = body;
 
     if (!title || !store_id) {
         return errorResponse('Title and store_id are required', 400);
     }
 
     const result = await env.DB.prepare(
-        'INSERT INTO coupons (store_id, title, short_description, code, discount_type, discount_value, min_purchase, max_discount, expiry_date, redirect_url, description, is_active, is_featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
-    ).bind(store_id, title, short_description || '', code || '', discount_type || 'percentage', discount_value || 0, min_purchase || 0, max_discount || 0, expiry_date || null, redirect_url || '', description || '', is_active ? 1 : 0, is_featured ? 1 : 0).run();
+        'INSERT INTO coupons (store_id, title, short_description, code, discount_type, discount_value, min_purchase, max_discount, expiry_date, redirect_url, description, is_active, is_featured, is_deal_of_week, is_hot_deal, deal_of_week_sort_order, hot_deal_sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+    ).bind(
+        store_id, 
+        title, 
+        short_description || '', 
+        code || '', 
+        discount_type || 'percentage', 
+        discount_value || 0, 
+        min_purchase || 0, 
+        max_discount || 0, 
+        expiry_date || null, 
+        redirect_url || '', 
+        description || '', 
+        is_active ? 1 : 0, 
+        is_featured ? 1 : 0,
+        is_deal_of_week || 0,
+        is_hot_deal || 0,
+        deal_of_week_sort_order || 0,
+        hot_deal_sort_order || 0
+    ).run();
 
     const newCoupon = await env.DB.prepare(
         'SELECT c.*, s.name as store_name FROM coupons c LEFT JOIN stores s ON c.store_id = s.id WHERE c.id = ?'
@@ -413,11 +519,30 @@ async function handleCreateCoupon(request, env) {
 
 async function handleUpdateCoupon(id, request, env) {
     const body = await request.json();
-    const { store_id, title, short_description, code, discount_type, discount_value, min_purchase, max_discount, expiry_date, redirect_url, description, is_active, is_featured } = body;
+    const { store_id, title, short_description, code, discount_type, discount_value, min_purchase, max_discount, expiry_date, redirect_url, description, is_active, is_featured, is_deal_of_week, is_hot_deal, deal_of_week_sort_order, hot_deal_sort_order } = body;
 
     const result = await env.DB.prepare(
-        'UPDATE coupons SET store_id = ?, title = ?, short_description = ?, code = ?, discount_type = ?, discount_value = ?, min_purchase = ?, max_discount = ?, expiry_date = ?, redirect_url = ?, description = ?, is_active = ?, is_featured = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
-    ).bind(store_id, title, short_description, code, discount_type, discount_value, min_purchase, max_discount, expiry_date, redirect_url, description, is_active ? 1 : 0, is_featured ? 1 : 0, id).run();
+        'UPDATE coupons SET store_id = ?, title = ?, short_description = ?, code = ?, discount_type = ?, discount_value = ?, min_purchase = ?, max_discount = ?, expiry_date = ?, redirect_url = ?, description = ?, is_active = ?, is_featured = ?, is_deal_of_week = ?, is_hot_deal = ?, deal_of_week_sort_order = ?, hot_deal_sort_order = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
+    ).bind(
+        store_id, 
+        title, 
+        short_description, 
+        code, 
+        discount_type, 
+        discount_value, 
+        min_purchase, 
+        max_discount, 
+        expiry_date, 
+        redirect_url, 
+        description, 
+        is_active ? 1 : 0, 
+        is_featured ? 1 : 0,
+        is_deal_of_week || 0,
+        is_hot_deal || 0,
+        deal_of_week_sort_order || 0,
+        hot_deal_sort_order || 0,
+        id
+    ).run();
 
     if (result.meta.changes === 0) {
         return errorResponse('Coupon not found', 404);
@@ -576,5 +701,110 @@ async function handleImageUpload(request, env) {
     } catch (error) {
         console.error('Image upload error:', error);
         return errorResponse('Failed to upload image: ' + error.message, 500);
+    }
+}
+
+// Hero Banners handlers
+async function handleGetBanners(env) {
+    try {
+        const { results } = await env.DB.prepare(
+            'SELECT * FROM hero_banners WHERE is_active = 1 ORDER BY sort_order ASC, created_at DESC'
+        ).all();
+        
+        return jsonResponse({ success: true, data: results || [] });
+    } catch (error) {
+        console.error('handleGetBanners error:', error);
+        return errorResponse('Failed to fetch banners: ' + error.message, 500);
+    }
+}
+
+async function handleCreateBanner(request, env) {
+    try {
+        const body = await request.json();
+        const { title, subtitle, small_text, button_text, button_url, background_image_url, sort_order } = body;
+
+        if (!title) {
+            return errorResponse('Title is required', 400);
+        }
+
+        const result = await env.DB.prepare(
+            'INSERT INTO hero_banners (title, subtitle, small_text, button_text, button_url, background_image_url, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?)'
+        ).bind(
+            title,
+            subtitle || '',
+            small_text || '',
+            button_text || '',
+            button_url || '',
+            background_image_url || '',
+            sort_order || 0
+        ).run();
+
+        if (!result.success) {
+            return errorResponse('Failed to create banner', 500);
+        }
+
+        const newBanner = await env.DB.prepare(
+            'SELECT * FROM hero_banners WHERE id = ?'
+        ).bind(result.meta.last_row_id).first();
+
+        return jsonResponse({ success: true, data: newBanner }, 201);
+    } catch (error) {
+        console.error('handleCreateBanner error:', error);
+        return errorResponse('Internal server error: ' + error.message, 500);
+    }
+}
+
+async function handleUpdateBanner(id, request, env) {
+    try {
+        const body = await request.json();
+        const { title, subtitle, small_text, button_text, button_url, background_image_url, sort_order, is_active } = body;
+
+        if (!title) {
+            return errorResponse('Title is required', 400);
+        }
+
+        const result = await env.DB.prepare(
+            'UPDATE hero_banners SET title = ?, subtitle = ?, small_text = ?, button_text = ?, button_url = ?, background_image_url = ?, sort_order = ?, is_active = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
+        ).bind(
+            title,
+            subtitle || '',
+            small_text || '',
+            button_text || '',
+            button_url || '',
+            background_image_url || '',
+            sort_order || 0,
+            is_active !== undefined ? (is_active ? 1 : 0) : 1,
+            id
+        ).run();
+
+        if (!result.success) {
+            return errorResponse('Failed to update banner', 500);
+        }
+
+        const updatedBanner = await env.DB.prepare(
+            'SELECT * FROM hero_banners WHERE id = ?'
+        ).bind(id).first();
+
+        return jsonResponse({ success: true, data: updatedBanner });
+    } catch (error) {
+        console.error('handleUpdateBanner error:', error);
+        return errorResponse('Internal server error: ' + error.message, 500);
+    }
+}
+
+async function handleDeleteBanner(id, env) {
+    try {
+        const result = await env.DB.prepare(
+            'DELETE FROM hero_banners WHERE id = ?'
+        ).bind(id).run();
+
+        if (!result.success) {
+            return errorResponse('Failed to delete banner', 500);
+        }
+
+        return jsonResponse({ success: true, message: 'Banner deleted successfully' });
+    } catch (error) {
+        console.error('handleDeleteBanner error:', error);
+        return errorResponse('Internal server error: ' + error.message, 500);
     }
 }
